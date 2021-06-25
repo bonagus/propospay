@@ -18,7 +18,7 @@ import { useTheme } from 'react-native-paper';
 
 import { AuthContext } from '../components/context';
 
-import Users from '../model/user';
+import Users from '../model/users';
 
 const SignInScreen = ({navigation}) => {
 
@@ -54,7 +54,7 @@ const SignInScreen = ({navigation}) => {
     }
 
     const handlePasswordChange = (val) => {
-        if( val.trim().length >= 8 ) {
+        if( val.trim().length >= 4 ) {
             setData({
                 ...data,
                 password: val,
@@ -116,7 +116,7 @@ const SignInScreen = ({navigation}) => {
       <View style={styles.container}>
           <StatusBar backgroundColor='#1976d2' barStyle="light-content"/>
         <View style={styles.header}>
-            <Text style={styles.text_header}>Welcome!</Text>
+            <Text style={styles.text_header}>Selamat Datang!</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
@@ -134,7 +134,7 @@ const SignInScreen = ({navigation}) => {
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Your Username"
+                    placeholder="Input Username"
                     placeholderTextColor="#666666"
                     style={[styles.textInput, {
                         color: colors.text
@@ -173,7 +173,7 @@ const SignInScreen = ({navigation}) => {
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Your Password"
+                    placeholder="Input Password"
                     placeholderTextColor="#666666"
                     secureTextEntry={data.secureTextEntry ? true : false}
                     style={[styles.textInput, {
@@ -202,21 +202,18 @@ const SignInScreen = ({navigation}) => {
             </View>
             { data.isValidPassword ? null : 
             <Animatable.View animation="fadeInLeft" duration={500}>
-            <Text style={styles.errorMsg}>Password must be 8 characters long.</Text>
+            <Text style={styles.errorMsg}>Password must be 4 characters long.</Text>
             </Animatable.View>
             }
             
 
-            <TouchableOpacity>
-                <Text style={{color: '#1976d2', marginTop:15}}>Forgot password?</Text>
-            </TouchableOpacity>
             <View style={styles.button}>
                 <TouchableOpacity
                     style={styles.signIn}
                     onPress={() => {loginHandle( data.username, data.password )}}
                 >
                 <LinearGradient
-                    colors={['#08d4c4', '#01ab9d']}
+                    colors={['#1976d2', '#2196f3']}
                     style={styles.signIn}
                 >
                     <Text style={[styles.textSign, {
@@ -226,7 +223,7 @@ const SignInScreen = ({navigation}) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('SignUpScreen')}
+                    onPress={() => navigation.navigate('SplashScreen')}
                     style={[styles.signIn, {
                         borderColor: '#1976d2',
                         borderWidth: 1,
@@ -235,7 +232,7 @@ const SignInScreen = ({navigation}) => {
                 >
                     <Text style={[styles.textSign, {
                         color: '#1976d2'
-                    }]}>Sign Up</Text>
+                    }]}>Kembali</Text>
                 </TouchableOpacity>
             </View>
         </Animatable.View>

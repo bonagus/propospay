@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Button, StyleSheet, StatusBar } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-const Home = ({navigation}) => {
+const HomeScreen = ({navigation}) => {
 
   const { colors } = useTheme();
 
@@ -20,7 +20,7 @@ const Home = ({navigation}) => {
     );
 };
 
-export default Home;
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {

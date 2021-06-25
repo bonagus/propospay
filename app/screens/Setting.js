@@ -1,14 +1,10 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { useTheme } from '@react-navigation/native';
 
-const ExploreScreen = () => {
-
-  const { colors } = useTheme();
-
+const SettingsScreen = () => {
     return (
       <View style={styles.container}>
-        <Text style={{color: colors.text}}>Explore Screen</Text>
+        <Text>Settings Screen</Text>
         <Button
           title="Click Here"
           onPress={() => alert('Button Clicked!')}
@@ -17,7 +13,7 @@ const ExploreScreen = () => {
     );
 };
 
-export default ExploreScreen;
+export default SettingsScreen;
 
 const styles = StyleSheet.create({
   container: {
