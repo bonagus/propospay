@@ -1,19 +1,25 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+import ReduxThunk from 'redux-thunk';
+import { createStore, applyMiddleware } from 'redux';
+import reducers from '../reducers';
+import ApprovalForm from '../components/ApprovalForm';
+import { Header } from '../components/common';
 
 const ExploreScreen = () => {
 
   const { colors } = useTheme();
 
     return (
-      <View style={styles.container}>
-        <Text style={{color: colors.text}}>Explore Screen</Text>
-        <Button
-          title="Click Here"
-          onPress={() => alert('Button Clicked!')}
-        />
-      </View>
+      <Provider store={createStore(reducers, {}, applyMiddleware(ReduxThunk))}>
+          <View style={ {flex : 1} }>
+              {/* <Header headerText="Time Approval" />
+              <ApprovalForm /> */}
+          </View>
+
+      </Provider>
     );
 };
 
