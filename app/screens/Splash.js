@@ -9,9 +9,20 @@ import {
     Image
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import LinearGradient from 'react-native-linear-gradient';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
+const PropayMenu = props => {
+  return (
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 20, paddingBottom: 14}}>
+      <TouchableOpacity onPress={props.nav}>
+        {/* <Image source={props.image}/> */}
+        <Icon name={props.icon} size={45} color={'#fff'}></Icon>
+        <Text style={{fontSize: 13, fontWeight: 'bold', color: 'white', marginTop: 15, textAlign: 'center',}}>{props.name}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const SplashScreen = ({navigation}) => {
     const { colors } = useTheme();
@@ -37,21 +48,14 @@ const SplashScreen = ({navigation}) => {
             <Text style={[styles.title, {
                 color: colors.text
             }]}>Proposal Approval!</Text>
-            <Text style={styles.text}>Masuk dengan akun untuk melihat menu</Text>
-            <View style={styles.button}>
-            <TouchableOpacity onPress={()=>navigation.navigate('SignInScreen')}>
-                <LinearGradient
-                    colors={['#1976d2', '#2196f3']}
-                    style={styles.signIn}
-                >
-                    <Text style={styles.textSign}>Halaman Login</Text>
-                    <MaterialIcons 
-                        name="navigate-next"
-                        color="#fff"
-                        size={20}
-                    />
-                </LinearGradient>
-            </TouchableOpacity>
+            <Text style={styles.text}>Silahkan pilih salah satu departemen dibawah</Text>
+            <View style={{marginTop: 25}}>
+                <View style={{flexDirection: 'row', backgroundColor: '#1976d2', borderBottomLeftRadius: 5, borderBottomRightRadius: 5}}>
+                    <PropayMenu name='DC' icon="cart-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                    <PropayMenu name='HO' icon="business-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                    <PropayMenu name='IC' icon="construct-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                    <PropayMenu name='PIZZA' icon="pizza-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                </View>
             </View>
         </Animatable.View>
       </View>

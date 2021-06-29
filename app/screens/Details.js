@@ -7,22 +7,22 @@ const DetailsScreen = ({navigation}) => {
   const { colors } = useTheme();
     return (
       
-      <WebView source={{ uri: "http://slcorp.or.id/dcmitra" }} />
-      // <View style={styles.container}>
-      //   <Text style={{color: colors.text}}>Details Screen</Text>
-      //   <Button
-      //       title="Go to details screen...again"
-      //       onPress={() => navigation.push("Details")}
-      //   />
-      //   <Button
-      //       title="Go to home"
-      //       onPress={() => navigation.navigate("Home")}
-      //   />
-      //   <Button
-      //       title="Go back"
-      //       onPress={() => navigation.goBack()}
-      //   />
-      // </View>
+      // <WebView source={{ uri: "http://slcorp.or.id/dcmitra" }} />
+      <View style={styles.container}>
+        <Text style={{color: colors.text}}>Details Screen</Text>
+        <Button
+            title="Go to details screen...again"
+            onPress={() => navigation.push("SupportScreen")}
+        />
+        <Button
+            title="Go to home"
+            onPress={() => {navigation.navigate('BookmarkScreen')}}
+        />
+        <Button
+            title="Go back"
+            onPress={() => navigation.goBack()}
+        />
+      </View>
     );
 };
 

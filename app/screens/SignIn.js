@@ -114,9 +114,10 @@ const SignInScreen = ({navigation}) => {
 
     return (
       <View style={styles.container}>
-          <StatusBar backgroundColor='#1976d2' barStyle="light-content"/>
+        <StatusBar backgroundColor='#1976d2' barStyle="light-content"/>
         <View style={styles.header}>
-            <Text style={styles.text_header}>Selamat Datang!</Text>
+            <Text style={styles.text_header}>Silahkan Login,</Text>
+            <Text style={styles.text_header}>Untuk Melanjutkan!</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
@@ -218,7 +219,7 @@ const SignInScreen = ({navigation}) => {
                 >
                     <Text style={[styles.textSign, {
                         color:'#fff'
-                    }]}>Sign In</Text>
+                    }]}>Login</Text>
                 </LinearGradient>
                 </TouchableOpacity>
 

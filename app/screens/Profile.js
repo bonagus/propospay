@@ -58,7 +58,7 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   header:{
-    backgroundColor: "#1976d2",
+    backgroundColor: "#2196f3",
     height:225,
   },
   avatar: {

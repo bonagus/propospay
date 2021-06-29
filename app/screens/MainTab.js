@@ -12,6 +12,8 @@ import ProfileScreen from './Profile';
 
 const HomeStack = createStackNavigator();
 const DetailsStack = createStackNavigator();
+const ExploreStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -35,16 +37,16 @@ const MainTabScreen = () => (
         name="Notifications"
         component={DetailsStackScreen}
         options={{
-          tabBarLabel: 'Details',
+          tabBarLabel: 'Search',
           tabBarColor: '#1f65ff',
           tabBarIcon: ({ color }) => (
-            <Icon name="ios-notifications" color={color} size={26} />
+            <Icon name="search" color={color} size={26} />
           ),
         }}
       />
       <Tab.Screen
         name="Explore"
-        component={ExploreScreen}
+        component={ExploreStackScreen}
         options={{
           tabBarLabel: 'Explore',
           tabBarColor: '#1f65ff',
@@ -55,12 +57,12 @@ const MainTabScreen = () => (
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStackScreen}
         options={{
           tabBarLabel: 'Setting',
           tabBarColor: '#1f65ff',
           tabBarIcon: ({ color }) => (
-            <Icon name="ios-cog" color={color} size={26} />
+            <Icon name="settings-outline" color={color} size={26} />
           ),
         }}
       />
@@ -88,18 +90,53 @@ const HomeStackScreen = ({navigation}) => (
 const DetailsStackScreen = ({navigation}) => (
 <DetailsStack.Navigator screenOptions={{
         headerStyle: {
-        backgroundColor: '#1f65ff',
+        backgroundColor: '#1976d2',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
         fontWeight: 'bold'
         }
     }}>
-        <DetailsStack.Screen name="Details" component={DetailsScreen} options={{
+        <DetailsStack.Screen name="Search" component={DetailsScreen} options={{
         headerLeft: () => (
-            <Icon.Button name="ios-menu" size={25} backgroundColor="#1f65ff" onPress={() => navigation.openDrawer()}></Icon.Button>
+            <Icon.Button name="home-sharp" size={25} backgroundColor="#1976d2" onPress={() => navigation.navigate("Home")}></Icon.Button>
         )
         }} />
 </DetailsStack.Navigator>
 );
-  
+
+const ExploreStackScreen = ({navigation}) => (
+<ExploreStack.Navigator screenOptions={{
+        headerStyle: {
+        backgroundColor: '#1976d2',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+        fontWeight: 'bold'
+        }
+    }}>
+        <ExploreStack.Screen name="History" component={ExploreScreen} options={{
+        headerLeft: () => (
+            <Icon.Button name="home-sharp" size={25} backgroundColor="#1976d2" onPress={() => navigation.navigate("Home")}></Icon.Button>
+        )
+        }} />
+</ExploreStack.Navigator>
+);
+
+const ProfileStackScreen = ({navigation}) => (
+<ProfileStack.Navigator screenOptions={{
+        headerStyle: {
+        backgroundColor: '#1976d2',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+        fontWeight: 'bold'
+        }
+    }}>
+        <ProfileStack.Screen name="Setting" component={ProfileScreen} options={{
+        headerLeft: () => (
+            <Icon.Button name="home-sharp" size={25} backgroundColor="#1976d2" onPress={() => navigation.navigate("Home")}></Icon.Button>
+        )
+        }} />
+</ProfileStack.Navigator>
+);

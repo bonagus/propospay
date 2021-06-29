@@ -20,13 +20,19 @@ import {
   DarkTheme as PaperDarkTheme 
 } from 'react-native-paper';
 
+import { createStackNavigator } from '@react-navigation/stack';
+
 import MainTabScreen from './screens/MainTab.js';
 
 import { AuthContext } from './components/context';
 
 import RootStackScreen from './screens/RootStack';
 
+import BookmarkScreen from './screens/Bookmark';
+
 import AsyncStorage from '@react-native-community/async-storage';
+
+const ScreenStack = createStackNavigator();
 
 const App = () => {
   // const [isLoading, setIsLoading] = React.useState(true);
@@ -160,7 +166,10 @@ const App = () => {
     <NavigationContainer theme={theme}>
       { loginState.userToken !== null ? 
       (
-        <MainTabScreen/>
+        <ScreenStack.Navigator>
+          <ScreenStack.Screen options={{headerShown: false}} name="Home" component={MainTabScreen} />
+          <ScreenStack.Screen name="BookmarkScreen" component={BookmarkScreen} />
+        </ScreenStack.Navigator>
       )
     :
       <RootStackScreen/>
