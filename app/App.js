@@ -168,7 +168,7 @@ const App = () => {
       (
         <ScreenStack.Navigator>
           <ScreenStack.Screen options={{headerShown: false}} name="Home" component={MainTabScreen} />
-          <ScreenStack.Screen name="BookmarkScreen" component={BookmarkScreen} />
+          <ScreenStack.Screen name="List-Proposal" component={BookmarkScreen} />
         </ScreenStack.Navigator>
       )
     :

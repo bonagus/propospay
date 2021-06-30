@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
+  Alert,
+  BackHandler,  
   TouchableOpacity
 } from 'react-native';
 import {
@@ -24,7 +26,50 @@ const ProfileScreen = () => {
 
   const paperTheme = useTheme();
 
-  const { signOut, toggleTheme } = React.useContext(AuthContext);
+  const { signOut } = React.useContext(AuthContext);
+  // const { signOut, toggleTheme } = React.useContext(AuthContext);
+
+  const confirmButton = () =>
+    Alert.alert(
+      'Logout',
+      'Yakin ingin logout dari sesi ini?',
+      [
+        {
+          text: 'Batal',
+          onPress: () => {
+            return null;
+          },
+          style: 'cancel'
+        },
+        { 
+          text: 'Ya',
+          onPress: () => {
+            signOut();
+          },
+        },
+      ]
+    );
+
+  const confirmButtoff = () =>
+    Alert.alert(
+      'Keluar',
+      'Yakin ingin keluar dari Aplikasi ini?',
+      [
+        {
+          text: 'Batal',
+          onPress: () => {
+            return null;
+          },
+          style: 'cancel'
+        },
+        { 
+          text: 'Ya',
+          onPress: () => {
+            BackHandler.exitApp();
+          },
+        },
+      ]
+    );
 
   return (
     <View style={styles.container}>
@@ -32,21 +77,22 @@ const ProfileScreen = () => {
         <Icon style={styles.avatar} name="ios-person" size={125} color={'#696969'}/>
         <View style={styles.body}>
           <View style={styles.bodyContent}>
-            <TouchableOpacity style={styles.buttonContainers}>
+            {/* <TouchableOpacity style={styles.buttonContainers}>
               <Text 
                 onPress={() => {toggleTheme()}}
                 style={styles.info}
               >
                 Ubah Tema
               </Text> 
-            </TouchableOpacity>       
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Text 
-                onPress={() => {signOut()}}
-                style={styles.info}
-              >
-                Keluar
-              </Text> 
+            </TouchableOpacity>        */}
+            <TouchableOpacity style={styles.buttonContainer}  onPress={confirmButton}>
+              <Text style={styles.info}>Logout </Text>
+              <Icon name="log-out" size={20} color={'#fff'}/> 
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.buttonContainer}  onPress={confirmButtoff}>
+              <Text style={styles.info}>Keluar </Text> 
+              <Icon name="power" size={20} color={'#fff'}/> 
             </TouchableOpacity>
           </View>
       </View>
@@ -92,7 +138,8 @@ const styles = StyleSheet.create({
   },
   info:{
     fontSize:20,
-    color: "#FFFFFF"
+    color: "#FFFFFF",
+    fontWeight: 'bold'
   },
   description:{
     fontSize:16,

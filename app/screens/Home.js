@@ -17,7 +17,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const PropayMenu2 = props => {
   return (
     <View style={{width: `${100/4}%`, alignItems: 'center'}}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={props.onPress}>
         <View style={{height: 58, width: 58, borderWidth: 1, borderColor: 'lightgrey', borderRadius: 18, justifyContent:'center', alignItems: 'center'}}>
           <Image source={props.image}/>
         </View>
@@ -43,10 +43,10 @@ const HomeScreen = ({navigation}) => {
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Cepat!</Text>
           <Text style={styles.text}>Pilih salah satu tipe approval dibawah.</Text>    
           <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 18}}>
-            <PropayMenu2 name='Approval 0' image={require('../assets/icon/go-more.png')}/>
-            <PropayMenu2 name='Approval 1' image={require('../assets/icon/go-deals.png')}/>
-            <PropayMenu2 name='Approval 2' image={require('../assets/icon/promo.png')}/>
-            <PropayMenu2 name='Approval 3' image={require('../assets/icon/go-send.png')}/>
+            <PropayMenu2 name='Approval 0' image={require('../assets/icon/go-more.png')} onPress={() => {navigation.navigate('List-Proposal')}}/>
+            <PropayMenu2 name='Approval 1' image={require('../assets/icon/go-deals.png')} onPress={() => {navigation.navigate('List-Proposal')}}/>
+            <PropayMenu2 name='Approval 2' image={require('../assets/icon/promo.png')} onPress={() => {navigation.navigate('List-Proposal')}}/>
+            <PropayMenu2 name='Approval 3' image={require('../assets/icon/go-send.png')} onPress={() => {navigation.navigate('List-Proposal')}}/>
           </View>
           <View style={{height: 5, marginTop: 50}}></View>
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Detail!</Text>

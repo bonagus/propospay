@@ -48,7 +48,7 @@ const MainTabScreen = () => (
         name="Explore"
         component={ExploreStackScreen}
         options={{
-          tabBarLabel: 'Explore',
+          tabBarLabel: 'History',
           tabBarColor: '#1f65ff',
           tabBarIcon: ({ color }) => (
             <Icon name="ios-menu" color={color} size={26} />

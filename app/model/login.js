@@ -16,15 +16,21 @@ import Feather from 'react-native-vector-icons/Feather';
 
 import { useTheme } from 'react-native-paper';
 
-import { AuthContext } from '../components/context';
+// import { AuthContext } from '../components/context';
 
-import Users from '../model/users';
+// import Users from '../model/users';
+
+import {Context} from '../components/context'
 
 const SignInScreen = ({navigation}) => {
 
-    const [data, setData] = React.useState({
-        username: '',
-        password: '',
+    const [data, setData, state, setState] = React.useState({
+        userInfo:{
+            username:'',
+            password:'',
+        },
+        errorMsg:'',
+        successMsg:'',
         check_textInputChange: false,
         secureTextEntry: true,
         isValidUser: true,
@@ -33,7 +39,7 @@ const SignInScreen = ({navigation}) => {
 
     const { colors } = useTheme();
 
-    const { signIn } = React.useContext(AuthContext);
+    const { signIn, loginUser, isLoggedIn } = React.useContext(Context);
 
     const textInputChange = (val) => {
         if( val.trim().length >= 4 ) {
@@ -112,6 +118,36 @@ const SignInScreen = ({navigation}) => {
         signIn(foundUser);
     }
 
+    // On Submit Login From
+    const submitForm = async (event) => {
+        event.preventDefault();
+        const data = await loginUser(state.userInfo);
+        if(data.success && data.token){
+            setState({
+                ...initialState,
+            });
+            localStorage.setItem('loginToken', data.token);
+            await isLoggedIn();
+        }
+        else{
+            setState({
+                ...state,
+                successMsg:'',
+                errorMsg:data.message
+            });
+        }
+    }
+
+    // Show Message on Error or Success
+    let successMsg = '';
+    let errorMsg = '';
+    if(state.errorMsg){
+        errorMsg = <Text style={styles.errorMsg}>{state.errorMsg}</Text>;
+    }
+    if(state.successMsg){
+        successMsg = <Text style={styles.successMsg}>{state.successMsg}</Text>;
+    }
+
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor='#1976d2' barStyle="light-content"/>
@@ -143,6 +179,7 @@ const SignInScreen = ({navigation}) => {
                     autoCapitalize="none"
                     onChangeText={(val) => textInputChange(val)}
                     onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
+                    value={state.userInfo.username}
                 />
                 {data.check_textInputChange ? 
                 <Animatable.View
@@ -182,6 +219,7 @@ const SignInScreen = ({navigation}) => {
                     }]}
                     autoCapitalize="none"
                     onChangeText={(val) => handlePasswordChange(val)}
+                    value={state.userInfo.password}
                 />
                 <TouchableOpacity
                     onPress={updateSecureTextEntry}
@@ -236,6 +274,8 @@ const SignInScreen = ({navigation}) => {
                     }]}>Kembali</Text>
                 </TouchableOpacity>
             </View>
+            {errorMsg}
+            {successMsg}
         </Animatable.View>
       </View>
     );
@@ -293,6 +333,10 @@ const styles = StyleSheet.create({
     },
     errorMsg: {
         color: '#FF0000',
+        fontSize: 14,
+    },
+    successMsg: {
+        color: 'green',
         fontSize: 14,
     },
     button: {

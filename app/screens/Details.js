@@ -9,17 +9,17 @@ const DetailsScreen = ({navigation}) => {
       
       // <WebView source={{ uri: "http://slcorp.or.id/dcmitra" }} />
       <View style={styles.container}>
-        <Text style={{color: colors.text}}>Details Screen</Text>
-        <Button
+        <Text style={{color: colors.text}}>Halaman Pencarian</Text>
+        {/* <Button
             title="Go to details screen...again"
-            onPress={() => navigation.push("SupportScreen")}
+            onPress={() => navigation.push("Explore")}
+        /> */}
+        <Button
+            title="Cari"
+            onPress={() => {navigation.navigate('List-Proposal')}}
         />
         <Button
-            title="Go to home"
-            onPress={() => {navigation.navigate('BookmarkScreen')}}
-        />
-        <Button
-            title="Go back"
+            title="Kembali"
             onPress={() => navigation.goBack()}
         />
       </View>
