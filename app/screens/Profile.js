@@ -4,6 +4,7 @@ import {
   View,
   Alert,
   BackHandler,  
+  FlatList,
   TouchableOpacity
 } from 'react-native';
 import {
@@ -74,7 +75,12 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
         <View style={styles.header}></View>
-        <Icon style={styles.avatar} name="ios-person" size={125} color={'#696969'}/>
+        <Icon style={styles.avatar} name="ios-person" size={125} color={'#FFFFFF'}/>
+        <View style={styles.subheader}>
+          <Text style={styles.name}>Anda Login Sebagai : </Text> 
+          <Text style={styles.name}>Nama 1</Text> 
+          <Text style={styles.name}>Database 1</Text> 
+        </View>
         <View style={styles.body}>
           <View style={styles.bodyContent}>
             {/* <TouchableOpacity style={styles.buttonContainers}>
@@ -105,7 +111,11 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   header:{
     backgroundColor: "#2196f3",
-    height:225,
+    height:150,
+  },
+  subheader:{
+    backgroundColor: "#2196f3",
+    height:90,
   },
   avatar: {
     width: 125,
@@ -116,12 +126,7 @@ const styles = StyleSheet.create({
     marginBottom:0,
     alignSelf:'center',
     position: 'absolute',
-    marginTop:75
-  },
-  name:{
-    fontSize:22,
-    color:"#FFFFFF",
-    fontWeight:'600',
+    marginTop:25
   },
   body:{
     marginTop:0,
@@ -132,9 +137,10 @@ const styles = StyleSheet.create({
     padding:30,
   },
   name:{
-    fontSize:28,
-    color: "#696969",
-    fontWeight: "600"
+    fontSize:20,
+    color: "#FFFFFF",
+    alignSelf:'center',
+    fontWeight: 'bold'
   },
   info:{
     fontSize:20,

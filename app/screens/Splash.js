@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
     View, 
     Text, 
@@ -6,11 +6,12 @@ import {
     Dimensions,
     StyleSheet,
     StatusBar,
-    Image
+    Alert
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { useTheme } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const PropayMenu = props => {
   return (
@@ -22,7 +23,7 @@ const PropayMenu = props => {
       </TouchableOpacity>
     </View>
   );
-};
+};  
 
 const SplashScreen = ({navigation}) => {
     const { colors } = useTheme();
@@ -51,10 +52,10 @@ const SplashScreen = ({navigation}) => {
             <Text style={styles.text}>Silahkan pilih salah satu departemen dibawah</Text>
             <View style={{marginTop: 25}}>
                 <View style={{flexDirection: 'row', backgroundColor: '#1976d2', borderBottomLeftRadius: 5, borderBottomRightRadius: 5}}>
-                    <PropayMenu name='DC' icon="cart-outline" nav={()=>navigation.navigate('SignInScreen')}/>
-                    <PropayMenu name='HO' icon="business-outline" nav={()=>navigation.navigate('SignInScreen')}/>
-                    <PropayMenu name='IC' icon="construct-outline" nav={()=>navigation.navigate('SignInScreen')}/>
-                    <PropayMenu name='PIZZA' icon="pizza-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                    <PropayMenu value='DC' name='DC' icon="cart-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                    <PropayMenu value='HO' name='HO' icon="business-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                    <PropayMenu value='IC' name='IC' icon="construct-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                    <PropayMenu value='PZ' name='PIZZA' icon="pizza-outline" nav={()=>navigation.navigate('SignInScreen')}/>
                 </View>
             </View>
         </Animatable.View>
