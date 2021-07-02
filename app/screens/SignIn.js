@@ -19,8 +19,14 @@ import { useTheme } from 'react-native-paper';
 import { AuthContext } from '../components/context';
 
 import Users from '../model/users';
+import AsyncStorage from '@react-native-community/async-storage';
+
+const STORAGE_KEY       = '@save_db';
+const STORAGE_KEYLOG    = '@save_db_login';
 
 const SignInScreen = ({navigation}) => {
+
+    const [valDb, setValDb] = React.useState(''); 
 
     const [data, setData] = React.useState({
         username: '',
@@ -30,6 +36,30 @@ const SignInScreen = ({navigation}) => {
         isValidUser: true,
         isValidPassword: true,
     });
+
+    React.useEffect(() => {
+       readData()
+    }, [])
+
+    const clearStorage = async () => {
+        try {
+            await AsyncStorage.clear()
+            navigation.navigate('SplashScreen')
+        } catch (e) {
+            alert('Failed to clear the async storage.')
+        }
+    }
+
+    const readData = async () => {
+    try {
+        const valDb = await AsyncStorage.getItem(STORAGE_KEY)
+        if(valDb !== null) {
+            setValDb(valDb)
+        }
+    } catch(e) {
+        navigation.navigate('SplashScreen')
+    }
+    }
 
     const { colors } = useTheme();
 
@@ -118,6 +148,7 @@ const SignInScreen = ({navigation}) => {
         <View style={styles.header}>
             <Text style={styles.text_header}>Silahkan Login,</Text>
             <Text style={styles.text_header}>Untuk Melanjutkan!</Text>
+            <Text style={styles.text_header}>Kode Dept : {valDb}</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
@@ -207,7 +238,6 @@ const SignInScreen = ({navigation}) => {
             </Animatable.View>
             }
             
-
             <View style={styles.button}>
                 <TouchableOpacity
                     style={styles.signIn}
@@ -224,7 +254,7 @@ const SignInScreen = ({navigation}) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('SplashScreen')}
+                    onPress={clearStorage}
                     style={[styles.signIn, {
                         borderColor: '#1976d2',
                         borderWidth: 1,

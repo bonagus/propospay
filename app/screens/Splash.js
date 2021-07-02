@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { 
-    View, 
-    Text, 
-    TouchableOpacity, 
+import React, { useState, useEffect } from 'react';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
     Dimensions,
     StyleSheet,
     StatusBar,
@@ -23,11 +24,61 @@ const PropayMenu = props => {
       </TouchableOpacity>
     </View>
   );
-};  
+}; 
+
+const STORAGE_KEY = '@save_db';
 
 const SplashScreen = ({navigation}) => {
     const { colors } = useTheme();
+    const [valDb, setValDb] = useState(''); 
 
+    useEffect(() => {
+       readData()
+    }, [])
+    
+    // read data
+    const readData = async () => {
+        try {
+            const valDb = await AsyncStorage.getItem(STORAGE_KEY)
+
+            if (valDb !== null) {
+                setValDb(valDb);
+            }
+            alert(valDb);
+        } catch (e) {
+            alert('Failed to fetch the data from storage')
+        }
+    }
+
+    // save data
+    const saveData = async (valDb) => {
+        try {
+            await AsyncStorage.setItem(STORAGE_KEY, valDb)
+            setValDb(valDb);
+            navigation.navigate('SignInScreen')
+        } catch (e) {
+            alert('Failed to save the data to the storage')
+        }
+    }
+
+    const clearStorage = async () => {
+        try {
+            await AsyncStorage.clear()
+            alert('Storage successfully cleared!')
+        } catch (e) {
+            alert('Failed to clear the async storage.')
+        }
+    }
+
+    const onChangeText = valDb => setValDb(valDb)
+
+    const onSubmitEditing = (valDb) => {
+        if (!valDb) return
+        console.log(valDb)
+        saveData(valDb)
+        setValDb(valDb)
+    }
+    
     return (
       <View style={styles.container}>
           <StatusBar backgroundColor='#000000' barStyle="light-content"/>
@@ -35,9 +86,9 @@ const SplashScreen = ({navigation}) => {
             <Animatable.Image 
                 animation="bounceIn"
                 duraton="1500"
-            source={require('../assets/Logo.png')}
-            style={styles.logo}
-            resizeMode="stretch"
+                source={require('../assets/Logo.png')}
+                style={styles.logo}
+                resizeMode="stretch"
             />
         </View>
         <Animatable.View 
@@ -52,10 +103,10 @@ const SplashScreen = ({navigation}) => {
             <Text style={styles.text}>Silahkan pilih salah satu departemen dibawah</Text>
             <View style={{marginTop: 25}}>
                 <View style={{flexDirection: 'row', backgroundColor: '#1976d2', borderBottomLeftRadius: 5, borderBottomRightRadius: 5}}>
-                    <PropayMenu value='DC' name='DC' icon="cart-outline" nav={()=>navigation.navigate('SignInScreen')}/>
-                    <PropayMenu value='HO' name='HO' icon="business-outline" nav={()=>navigation.navigate('SignInScreen')}/>
-                    <PropayMenu value='IC' name='IC' icon="construct-outline" nav={()=>navigation.navigate('SignInScreen')}/>
-                    <PropayMenu value='PZ' name='PIZZA' icon="pizza-outline" nav={()=>navigation.navigate('SignInScreen')}/>
+                    <PropayMenu name='DC' icon="cart-outline" nav={() => onSubmitEditing('DC')}/>
+                    <PropayMenu name='HO' icon="business-outline" nav={() => onSubmitEditing('HO')}/>
+                    <PropayMenu name='IC' icon="construct-outline" nav={() => onSubmitEditing('IC')}/>
+                    <PropayMenu name='PIZZA' icon="pizza-outline" nav={() => onSubmitEditing('PZ')}/>
                 </View>
             </View>
         </Animatable.View>
