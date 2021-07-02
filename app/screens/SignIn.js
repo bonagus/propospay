@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, createRef} from 'react';
 import { 
     View, 
     Text, 
@@ -13,20 +13,74 @@ import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
-
 import { useTheme } from 'react-native-paper';
-
 import { AuthContext } from '../components/context';
-
 import Users from '../model/users';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const STORAGE_KEY       = '@save_db';
-const STORAGE_KEYLOG    = '@save_db_login';
-
+const STORAGE_KEYLOG    = '@save_id';
+// class SignInScreen extends Component {
 const SignInScreen = ({navigation}) => {
 
-    const [valDb, setValDb] = React.useState(''); 
+    const [valDb, setValDb] = useState(''); 
+    const [userName, setUserName] = useState('');
+    const [userPassword, setUserPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [errortext, setErrortext] = useState('');
+  
+    const passwordInputRef = createRef();
+
+    const handleSubmitPress = () => {
+        setErrortext('');
+        if (!userName) {
+            alert('Please fill Username');
+            return;
+        }
+        if (!userPassword) {
+            alert('Please fill Password');
+            return;
+        }
+        setLoading(true);
+        let dataToSend = {database: valDb, username: userName, password: userPassword};
+        let formBody = [];
+        for (let key in dataToSend) {
+            let encodedKey = encodeURIComponent(key);
+            let encodedValue = encodeURIComponent(dataToSend[key]);
+            formBody.push(encodedKey + '=' + encodedValue);
+        }
+        formBody = formBody.join('&');
+
+        fetch('http://slcorp.or.id/api/prop/login.php', {
+            method: 'POST',
+            body: formBody,
+            headers: {
+                //Header Defination
+                'Content-Type':
+                'application/x-www-form-urlencoded;charset=UTF-8',
+            },
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+            //Hide Loader
+            setLoading(false);
+            console.log(responseJson);
+            // If server response message same as Data Matched
+            if (responseJson.status === userName ) {
+            AsyncStorage.setItem('user_id', responseJson.data.username);
+            console.log(responseJson.data.email);
+            navigation.replace('DrawerNavigationRoutes');
+            } else {
+            setErrortext(responseJson.msg);
+            console.log('Please check your email id or password');
+            }
+        })
+        .catch((error) => {
+            //Hide Loader
+            setLoading(false);
+            console.error(error);
+        });
+    };
 
     const [data, setData] = React.useState({
         username: '',
