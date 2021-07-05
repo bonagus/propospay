@@ -11,6 +11,7 @@ import {
           TouchableOpacity
         } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -38,8 +39,13 @@ const HomeScreen = ({navigation}) => {
         <StatusBar barStyle= { theme.dark ? "light-content" : "dark-content" }/>
         <View style={styles.header}>
             <Text style={styles.text_header}>Selamat Datang!</Text>
-        </View>          
-        <View style={styles.footer}>
+        </View>
+        <Animatable.View 
+            animation="fadeInUpBig"
+            style={[styles.footer, {
+                backgroundColor: colors.background
+            }]}
+        >
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Cepat!</Text>
           <Text style={styles.text}>Pilih salah satu tipe approval dibawah.</Text>    
           <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 18}}>
@@ -65,9 +71,8 @@ const HomeScreen = ({navigation}) => {
                     />
                 </LinearGradient>
             </TouchableOpacity>
-          </View>
-        </View>
-        
+          </View>        
+        </Animatable.View>
       </View>
     );
 };

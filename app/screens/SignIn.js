@@ -1,4 +1,4 @@
-import React, {useState, createRef} from 'react';
+import React, {useState} from 'react';
 import { 
     View, 
     Text, 
@@ -7,7 +7,8 @@ import {
     Platform,
     StyleSheet ,
     StatusBar,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
@@ -15,74 +16,22 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTheme } from 'react-native-paper';
 import { AuthContext } from '../components/context';
-import Users from '../model/users';
+import Loader from '../components/Loader';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const STORAGE_KEY       = '@save_db';
-const STORAGE_KEYLOG    = '@save_id';
-// class SignInScreen extends Component {
+const STORAGE_KEYLOG    = '@save_db_login';
+
 const SignInScreen = ({navigation}) => {
 
-    const [valDb, setValDb] = useState(''); 
-    const [userName, setUserName] = useState('');
-    const [userPassword, setUserPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [valDb, setValDb]         = useState(''); 
+    const [Spinner, setSpinner]     = useState(false);
+    // const [loading, setLoading]     = useState(false);
     const [errortext, setErrortext] = useState('');
-  
-    const passwordInputRef = createRef();
 
-    const handleSubmitPress = () => {
-        setErrortext('');
-        if (!userName) {
-            alert('Please fill Username');
-            return;
-        }
-        if (!userPassword) {
-            alert('Please fill Password');
-            return;
-        }
-        setLoading(true);
-        let dataToSend = {database: valDb, username: userName, password: userPassword};
-        let formBody = [];
-        for (let key in dataToSend) {
-            let encodedKey = encodeURIComponent(key);
-            let encodedValue = encodeURIComponent(dataToSend[key]);
-            formBody.push(encodedKey + '=' + encodedValue);
-        }
-        formBody = formBody.join('&');
+    // const passwordInputRef                  = createRef();
 
-        fetch('http://slcorp.or.id/api/prop/login.php', {
-            method: 'POST',
-            body: formBody,
-            headers: {
-                //Header Defination
-                'Content-Type':
-                'application/x-www-form-urlencoded;charset=UTF-8',
-            },
-        })
-        .then((response) => response.json())
-        .then((responseJson) => {
-            //Hide Loader
-            setLoading(false);
-            console.log(responseJson);
-            // If server response message same as Data Matched
-            if (responseJson.status === userName ) {
-            AsyncStorage.setItem('user_id', responseJson.data.username);
-            console.log(responseJson.data.email);
-            navigation.replace('DrawerNavigationRoutes');
-            } else {
-            setErrortext(responseJson.msg);
-            console.log('Please check your email id or password');
-            }
-        })
-        .catch((error) => {
-            //Hide Loader
-            setLoading(false);
-            console.error(error);
-        });
-    };
-
-    const [data, setData] = React.useState({
+    const [data, setData] = useState({
         username: '',
         password: '',
         check_textInputChange: false,
@@ -105,14 +54,14 @@ const SignInScreen = ({navigation}) => {
     }
 
     const readData = async () => {
-    try {
-        const valDb = await AsyncStorage.getItem(STORAGE_KEY)
-        if(valDb !== null) {
-            setValDb(valDb)
+        try {
+            const valDb = await AsyncStorage.getItem(STORAGE_KEY)
+            if(valDb !== null) {
+                setValDb(valDb)
+            }
+        } catch(e) {
+            navigation.navigate('SplashScreen')
         }
-    } catch(e) {
-        navigation.navigate('SplashScreen')
-    }
     }
 
     const { colors } = useTheme();
@@ -174,11 +123,14 @@ const SignInScreen = ({navigation}) => {
         }
     }
 
-    const loginHandle = (userName, password) => {
+    const loginHandle = (username, password) => {
 
-        const foundUser = Users.filter( item => {
-            return userName == item.username && password == item.password;
-        } );
+        // const foundUser = Users.filter( item => {
+        //     return username == item.username && password == item.password;
+        // } );
+
+        setErrortext('');
+        setSpinner(true);
 
         if ( data.username.length == 0 || data.password.length == 0 ) {
             Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
@@ -187,22 +139,69 @@ const SignInScreen = ({navigation}) => {
             return;
         }
 
-        if ( foundUser.length == 0 ) {
-            Alert.alert('Invalid User!', 'Username or password is incorrect.', [
-                {text: 'Okay'}
-            ]);
-            return;
-        }
-        signIn(foundUser);
+        fetch('http://slcorp.or.id/api/prop/login.php', {  
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+            
+                database: valDb, 
+                username: username, 
+                password: password
+            
+            })
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+            //Hide Loader
+            console.log(responseJson.result);
+            // console.log(data.username);
+            
+            // If server response message same as Data Matched
+            if (responseJson.result) {
+                AsyncStorage.setItem(STORAGE_KEYLOG, responseJson.username);
+                signIn(responseJson.username);
+            } else {
+                setErrortext(responseJson.result);
+                Alert.alert('Invalid User!', 'Username or password is incorrect.', [
+                    {text: 'Okay'}
+                ]);
+                console.log('Username or password is incorrect');
+                setSpinner(false);
+                return;
+            }
+        })
+        .catch((error) => {
+            //Hide Loader
+            setSpinner(false);
+            console.error(error);
+        });
+        // if ( foundUser.length == 0 ) {
+        //     Alert.alert('Invalid User!', 'Username or password is incorrect.', [
+        //         {text: 'Okay'}
+        //     ]);
+        //     return;
+        // }
     }
 
+
+    if( Spinner ) {
+        return(
+        <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+            <ActivityIndicator size="large" color="#1f65ff" />
+        </View>
+        );
+    }
     return (
       <View style={styles.container}>
+        {/* <Loader loading={Spinner} /> */}
         <StatusBar backgroundColor='#1976d2' barStyle="light-content"/>
         <View style={styles.header}>
             <Text style={styles.text_header}>Silahkan Login,</Text>
             <Text style={styles.text_header}>Untuk Melanjutkan!</Text>
-            <Text style={styles.text_header}>Kode Dept : {valDb}</Text>
+            <Text style={styles.text_header}>Kode Entitas : {valDb}</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
