@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { 
@@ -20,7 +12,7 @@ import {
   DarkTheme as PaperDarkTheme 
 } from 'react-native-paper';
 
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 
 import MainTabScreen from './screens/MainTab.js';
 
@@ -108,8 +100,9 @@ const App = () => {
     signIn: async(foundUser) => {
       // setUserToken('fgkj');
       // setIsLoading(false);
-      const userToken = String(foundUser[0].userToken);
-      const userName = foundUser[0].username;
+      const userToken = String(foundUser);
+      const userName = foundUser;
+      // alert(loginState.isLoading)
       
       try {
         await AsyncStorage.setItem('userToken', userToken);
@@ -156,7 +149,7 @@ const App = () => {
   if( loginState.isLoading ) {
     return(
       <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-        <ActivityIndicator size="large"/>
+        <ActivityIndicator size="large" color="#00ff00" />
       </View>
     );
   }
@@ -166,7 +159,11 @@ const App = () => {
     <NavigationContainer theme={theme}>
       { loginState.userToken !== null ? 
       (
-        <ScreenStack.Navigator>
+        <ScreenStack.Navigator
+          screenOptions={{    
+            ...TransitionPresets.ScaleFromCenterAndroid,
+          }}
+        >
           <ScreenStack.Screen options={{headerShown: false}} name="Home" component={MainTabScreen} />
           <ScreenStack.Screen name="List-Proposal" component={BookmarkScreen} />
         </ScreenStack.Navigator>

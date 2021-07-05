@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -21,6 +21,8 @@ const MainTabScreen = () => (
     <Tab.Navigator
       initialRouteName="Home"
       activeColor="#fff"
+      sceneAnimationEnabled="true"
+      keyboardHidesNavigationBar="true"
     >
       <Tab.Screen
         name="Home"
@@ -71,19 +73,29 @@ const MainTabScreen = () => (
 
 export default MainTabScreen;
 
+const forFade = ({ current }) => ({
+  cardStyle: {
+    opacity: current.progress,
+  },
+});
 const HomeStackScreen = ({navigation}) => (
-<HomeStack.Navigator screenOptions={{
+<HomeStack.Navigator 
+    screenOptions={{
         headerStyle: {
-        backgroundColor: '#1976d2',
+          backgroundColor: '#1976d2',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {
-        fontWeight: 'bold'
+          fontWeight: 'bold'
         }
     }}>
-        <HomeStack.Screen name="Home" component={HomeScreen} options={{
-        title:'Proposal Approval'
-        }} />
+        <HomeStack.Screen 
+          name="Home" 
+          component={HomeScreen} 
+          options={{
+            title:'Proposal Approval'
+          }} 
+        />
 </HomeStack.Navigator>
 );
 

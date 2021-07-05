@@ -20,13 +20,47 @@ import {
 } from 'react-native-paper';
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-community/async-storage';
+
+const STORAGE_KEY       = '@save_db';
+const STORAGE_KEYLOG    = '@save_db_login';
 
 import{ AuthContext } from '../components/context';
 
 const ProfileScreen = () => {
 
-  const paperTheme = useTheme();
+  const [uname, setuname] = React.useState(''); 
+  const [dbname, setdbname] = React.useState(''); 
 
+  React.useEffect(() => {
+      readData()
+  }, [])
+  
+  // read data
+  const readData = async () => {
+      try {
+          const dbname  = await AsyncStorage.getItem(STORAGE_KEY);
+          const uname   = await AsyncStorage.getItem(STORAGE_KEYLOG);
+
+          if (dbname !== null) {
+              setdbname(dbname);
+              setuname(uname);
+          }
+      } catch (e) {
+          alert('Failed to fetch the data from storage')
+      }
+  }
+  
+  const clearStorage = async () => {
+      try {
+          await AsyncStorage.clear()
+          signOut()
+      } catch (e) {
+          alert('Failed to clear the async storage.')
+      }
+  }
+
+  const paperTheme = useTheme();
   const { signOut } = React.useContext(AuthContext);
   // const { signOut, toggleTheme } = React.useContext(AuthContext);
 
@@ -45,7 +79,7 @@ const ProfileScreen = () => {
         { 
           text: 'Ya',
           onPress: () => {
-            signOut();
+            clearStorage();
           },
         },
       ]
@@ -77,9 +111,9 @@ const ProfileScreen = () => {
         <View style={styles.header}></View>
         <Icon style={styles.avatar} name="ios-person" size={125} color={'#FFFFFF'}/>
         <View style={styles.subheader}>
-          <Text style={styles.name}>Anda Login Sebagai : </Text> 
-          <Text style={styles.name}>Nama 1</Text> 
-          <Text style={styles.name}>Database 1</Text> 
+          <Text style={styles.name}>Anda Login Sebagai</Text> 
+          <Text style={styles.name}>Nama : {uname}</Text> 
+          <Text style={styles.name}>Entitas : {dbname}</Text> 
         </View>
         <View style={styles.body}>
           <View style={styles.bodyContent}>

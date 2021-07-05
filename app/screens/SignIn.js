@@ -1,4 +1,4 @@
-import React, {useState, createRef} from 'react';
+import React, {useState} from 'react';
 import { 
     View, 
     Text, 
@@ -7,7 +7,8 @@ import {
     Platform,
     StyleSheet ,
     StatusBar,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
@@ -15,7 +16,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import { useTheme } from 'react-native-paper';
 import { AuthContext } from '../components/context';
-import Users from '../model/users';
+import Loader from '../components/Loader';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const STORAGE_KEY       = '@save_db';
@@ -23,9 +24,10 @@ const STORAGE_KEYLOG    = '@save_db_login';
 
 const SignInScreen = ({navigation}) => {
 
-    const [valDb, setValDb]                 = useState(''); 
-    const [loading, setLoading]             = useState(false);
-    const [errortext, setErrortext]         = useState('');
+    const [valDb, setValDb]         = useState(''); 
+    const [Spinner, setSpinner]     = useState(false);
+    // const [loading, setLoading]     = useState(false);
+    const [errortext, setErrortext] = useState('');
 
     // const passwordInputRef                  = createRef();
 
@@ -128,7 +130,7 @@ const SignInScreen = ({navigation}) => {
         // } );
 
         setErrortext('');
-        setLoading(true);
+        setSpinner(true);
 
         if ( data.username.length == 0 || data.password.length == 0 ) {
             Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
@@ -154,27 +156,28 @@ const SignInScreen = ({navigation}) => {
         .then((response) => response.json())
         .then((responseJson) => {
             //Hide Loader
-            setLoading(false);
-            console.log(responseJson);
-            console.log(data.username);
-            console.log(response.json(userid));
-            const foundUser = responseJson.filter( item => {
-                return userName == item.userid && password == item.password;
-            } );
+            console.log(responseJson.result);
+            // console.log(data.username);
+            
             // If server response message same as Data Matched
-            if (responseJson.userid === data.username ) {
-            AsyncStorage.setItem(STORAGE_KEYLOG, responseJson.userid);
-            console.log(responseJson.userid);
-            // navigation.replace('DrawerNavigationRoutes');
-            console.log('login cuy');
+            if (responseJson.result) {
+                AsyncStorage.setItem(STORAGE_KEYLOG, responseJson.username);
+                signIn(responseJson.username);
+                // navigation.replace('DrawerNavigationRoutes');
+                setSpinner(false);
             } else {
-            setErrortext(responseJson.msg);
-            console.log('Please check your email id or password');
+                setErrortext(responseJson.result);
+                Alert.alert('Invalid User!', 'Username or password is incorrect.', [
+                    {text: 'Okay'}
+                ]);
+                console.log('Username or password is incorrect');
+                setSpinner(false);
+                return;
             }
         })
         .catch((error) => {
             //Hide Loader
-            setLoading(false);
+            setSpinner(false);
             console.error(error);
         });
         // if ( foundUser.length == 0 ) {
@@ -183,11 +186,19 @@ const SignInScreen = ({navigation}) => {
         //     ]);
         //     return;
         // }
-        // signIn(foundUser);
     }
 
+
+    if( Spinner ) {
+        return(
+        <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+            <ActivityIndicator size="large" color="#00ff00" />
+        </View>
+        );
+    }
     return (
       <View style={styles.container}>
+        {/* <Loader loading={Spinner} /> */}
         <StatusBar backgroundColor='#1976d2' barStyle="light-content"/>
         <View style={styles.header}>
             <Text style={styles.text_header}>Silahkan Login,</Text>
