@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { useState } from 'react';
 import { 
           View, 
           Text, 
@@ -14,6 +14,9 @@ import { useTheme } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-community/async-storage';
+
+const STORAGE_KEY_APPRVL = '@save_db_apprvl';
 
 const PropayMenu2 = props => {
   return (
@@ -22,7 +25,7 @@ const PropayMenu2 = props => {
         <View style={{height: 58, width: 58, borderWidth: 1, borderColor: 'lightgrey', borderRadius: 18, justifyContent:'center', alignItems: 'center'}}>
           <Image source={props.image}/>
         </View>
-        <Text style={{fontSize: 11, fontWeight: 'bold', alignSelf: 'center', marginTop: 6}}>{props.name}</Text>
+        <Text style={{fontSize: 11, fontWeight: 'bold', justifyContent:'center', alignSelf: 'center', marginTop: 6}}>{props.name}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -30,9 +33,31 @@ const PropayMenu2 = props => {
 
 const HomeScreen = ({navigation}) => {
 
+  const [stageApprvl, setValstageApprvl] = useState(''); 
+
   const { colors } = useTheme();
 
   const theme = useTheme();
+
+  // save data
+  const saveData = async (stageApprvl) => {
+      try {
+          await AsyncStorage.setItem(STORAGE_KEY_APPRVL, stageApprvl)
+          setValstageApprvl(stageApprvl);
+          alert(stageApprvl)
+          navigation.navigate('List-Proposal')
+      } catch (e) {
+          alert('Failed to save the data to the storager')
+          return
+      }
+  }
+
+  const onSelectApprvl = (stageApprvl) => {
+      if (!stageApprvl) return
+      console.log(stageApprvl)
+      saveData(stageApprvl)
+      setValstageApprvl(stageApprvl)
+  }
   
     return (
       <View style={styles.container}>
@@ -49,16 +74,16 @@ const HomeScreen = ({navigation}) => {
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Cepat!</Text>
           <Text style={styles.text}>Pilih salah satu tipe approval dibawah.</Text>    
           <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 18}}>
-            <PropayMenu2 name='Approval 0' image={require('../assets/icon/go-more.png')} onPress={() => {navigation.navigate('List-Proposal')}}/>
-            <PropayMenu2 name='Approval 1' image={require('../assets/icon/go-deals.png')} onPress={() => {navigation.navigate('List-Proposal')}}/>
-            <PropayMenu2 name='Approval 2' image={require('../assets/icon/promo.png')} onPress={() => {navigation.navigate('List-Proposal')}}/>
-            <PropayMenu2 name='Approval 3' image={require('../assets/icon/go-send.png')} onPress={() => {navigation.navigate('List-Proposal')}}/>
+            <PropayMenu2 name='Belum Approval' image={require('../assets/icon/go-more.png')} onPress={() => onSelectApprvl('0')}/>
+            <PropayMenu2 name='Approval 1' image={require('../assets/icon/go-deals.png')} onPress={() => onSelectApprvl('1')}/>
+            <PropayMenu2 name='Approval 2' image={require('../assets/icon/promo.png')} onPress={() => onSelectApprvl('2')}/>
+            <PropayMenu2 name='Approval 3' image={require('../assets/icon/go-send.png')} onPress={() => onSelectApprvl('3')}/>
           </View>
           <View style={{height: 5, marginTop: 50}}></View>
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Detail!</Text>
           <Text style={styles.text}>Klik tombol untuk melakukan pencarian dengan filter.</Text>   
           <View style={styles.button}>
-            <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
+            <TouchableOpacity onPress={()=>{navigation.navigate('Search')}}>
                 <LinearGradient
                     colors={['#1976d2', '#2196f3']}
                     style={styles.signIn}

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,24 +11,89 @@ import {
   Button
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-community/async-storage';
+
+const STORAGE_KEY         = '@save_db';
+const STORAGE_KEYID       = '@save_db_id';
+const STORAGE_KEY_APPRVL  = '@save_db_apprvl';
 
 export default class BookmarkScreen extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      data: [
-        {id:1, title: "Lorem ipsum dolor",                  time:"2018-08-01 12:15 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean  ligula..."},
-        {id:2, title: "Sit amet, consectetuer",             time:"2018-08-12 12:00 pm", nominal:"5000000", description:"Lorem  dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula..."} ,
-        {id:3, title: "Dipiscing elit. Aenean ",            time:"2017-08-05 12:21 pm", nominal:"5000000", description:"Lorem ipsum dolor sit , consectetuer  elit. Aenean commodo ligula..."}, 
-        {id:4, title: "Commodo ligula eget dolor.",         time:"2015-08-12 12:00 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula..."}, 
-        {id:5, title: "Aenean massa. Cum sociis",           time:"2013-06-12 12:11 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  commodo ligula..."}, 
-        {id:6, title: "Natoque penatibus et magnis",        time:"2018-08-12 12:56 pm", nominal:"5000000", description:"Lorem ipsum  sit amet, consectetuer adipiscing elit. Aenean commodo ligula..."}, 
-        {id:7, title: "Dis parturient montes, nascetur",    time:"2018-08-12 12:33 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula..."}, 
-        {id:8, title: "Ridiculus mus. Donec quam",          time:"2018-06-12 12:44 pm", nominal:"5000000", description:"Lorem ipsum  sit amet, consectetuer adipiscing elit.  commodo ligula..."},
-        {id:9, title: "Felis, ultricies nec, pellentesque", time:"2012-07-12 12:23 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer  elit. Aenean commodo ligula..."},
-      ]
+      data: []
     };
+    
+    const [valDb, setValDb] = useState(''); 
+    const [idUser, setValUser] = useState(''); 
+    const [stageApprvl, setValApprvl] = useState(''); 
+
+    useEffect(() => {
+        readData()
+    }, [])
+      
+    const readData = async () => {
+          try {
+              const valDb = await AsyncStorage.getItem(STORAGE_KEY)
+              const idUser = await AsyncStorage.getItem(STORAGE_KEYID)
+              const stageApprvl = await AsyncStorage.getItem(STORAGE_KEY_APPRVL)
+              if(valDb !== null) {
+                  setValDb(valDb)
+              }
+              if(idUser !== null) {
+                  setValUser(idUser)
+              }
+              if(stageApprvl !== null) {
+                  setValApprvl(stageApprvl)
+              }
+          } catch(e) {
+              navigation.navigate('Home')
+          }
+      }
+  }
+
+  componentDidMount() {
+    fetch('http://slcorp.or.id/api/prop/fetch_aproval.php', {  
+        method: 'POST',
+        headers: {
+            'Accept'        : 'application/json',
+            'Content-Type'  : 'application/json',
+        },
+        body: JSON.stringify({
+        
+            database: valDb, 
+            kodeuser: idUser, 
+            approval: stageApprvl
+        
+        })
+    })
+
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //Hide Loader
+        console.log(responseJson);
+        // console.log(data.username);
+        
+        // If server response message same as Data Matched
+        if (responseJson.result) {
+            this.setState({ data: responseJson.data })
+        } else {
+            setErrortext(responseJson.result);
+            Alert.alert('null.', [
+                {text: 'Okay'}
+            ]);
+            console.log('Username or password is incorrect');
+            setSpinner(false);
+            return;
+        }
+    })
+    .catch((error) => {
+        //Hide Loader
+        setSpinner(false);
+        console.error(error);
+    });
+    
   }
 
   render() {
@@ -37,7 +102,7 @@ export default class BookmarkScreen extends Component {
         <FlatList style={styles.list}
           data={this.state.data}
           keyExtractor= {(item) => {
-            return item.id;
+            return item.kode_dokumen;
           }}
           ItemSeparatorComponent={() => {
             return (
@@ -51,11 +116,11 @@ export default class BookmarkScreen extends Component {
                 {/* <Image style={styles.cardImage} source={{uri:item.image}}/> */}
                 <View style={styles.cardHeader}>
                   <View>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.description}>Nama - Depart</Text>
-                    <Text style={styles.description}>{item.description}</Text>
+                    <Text style={styles.title}>{item.kepada}</Text>
+                    <Text style={styles.description}>{item.debet_rp}</Text>
+                    <Text style={styles.description}>{item.catatan}</Text>
                     <View style={styles.timeContainer}>
-                      <Text style={styles.time}>{item.time}</Text>
+                      <Text style={styles.time}>{item.tgl_dokumen}</Text>
                     </View>
                   </View>
                 </View>
