@@ -21,13 +21,14 @@ import { AuthContext } from './components/context';
 import RootStackScreen from './screens/RootStack';
 
 import BookmarkScreen from './screens/Bookmark';
+import DetailsScreen from './screens/Details';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
 const ScreenStack = createStackNavigator();
 
 const App = () => {
-  // const [isLoading, setIsLoading] = React.useState(true);
+  // const [isLoading, setIsLoading] = React.useState(false);
   // const [userToken, setUserToken] = React.useState(null); 
 
   const [isDarkTheme, setIsDarkTheme] = React.useState(false);
@@ -55,8 +56,8 @@ const App = () => {
     colors: {
       ...NavigationDarkTheme.colors,
       ...PaperDarkTheme.colors,
-      background: '#333333',
-      text: '#ffffff'
+      background: '#ffffff',
+      text: '#333333'
     }
   }
 
@@ -98,8 +99,10 @@ const App = () => {
 
   const authContext = React.useMemo(() => ({
     signIn: async(foundUser) => {
-      // setUserToken('fgkj');
+        loginState.isLoading = true;
+        console.log(loginState.isLoading);
       // setIsLoading(false);
+      // setUserToken('fgkj');
       const userToken = String(foundUser);
       const userName = foundUser;
       // alert(loginState.isLoading)
@@ -111,10 +114,13 @@ const App = () => {
       }
       // console.log('user token: ', userToken);
       dispatch({ type: 'LOGIN', id: userName, token: userToken });
+      // isLoading(true);
     },
     signOut: async() => {
-      // setUserToken(null);
+        loginState.isLoading = true;
+        console.log(loginState.isLoading);
       // setIsLoading(false);
+      // setUserToken(null);
       try {
         await AsyncStorage.removeItem('userToken');
       } catch(e) {
@@ -149,7 +155,7 @@ const App = () => {
   if( loginState.isLoading ) {
     return(
       <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-        <ActivityIndicator size="large" color="#00ff00" />
+        <ActivityIndicator size="large" color="#1f65ff" />
       </View>
     );
   }
@@ -166,6 +172,7 @@ const App = () => {
         >
           <ScreenStack.Screen options={{headerShown: false}} name="Home" component={MainTabScreen} />
           <ScreenStack.Screen name="List-Proposal" component={BookmarkScreen} />
+          <ScreenStack.Screen name="Search" component={DetailsScreen} />
         </ScreenStack.Navigator>
       )
     :

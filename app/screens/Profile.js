@@ -24,6 +24,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 const STORAGE_KEY       = '@save_db';
 const STORAGE_KEYLOG    = '@save_db_login';
+// const STORAGE_KEYID     = '@save_db_id';
 
 import{ AuthContext } from '../components/context';
 

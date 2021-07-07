@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 const STORAGE_KEY       = '@save_db';
 const STORAGE_KEYLOG    = '@save_db_login';
+const STORAGE_KEYID     = '@save_db_id';
 
 const SignInScreen = ({navigation}) => {
 
@@ -142,8 +143,8 @@ const SignInScreen = ({navigation}) => {
         fetch('http://slcorp.or.id/api/prop/login.php', {  
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
+                'Accept'        : 'application/json',
+                'Content-Type'  : 'application/json',
             },
             body: JSON.stringify({
             
@@ -156,15 +157,14 @@ const SignInScreen = ({navigation}) => {
         .then((response) => response.json())
         .then((responseJson) => {
             //Hide Loader
-            console.log(responseJson.result);
+            console.log(responseJson);
             // console.log(data.username);
             
             // If server response message same as Data Matched
             if (responseJson.result) {
                 AsyncStorage.setItem(STORAGE_KEYLOG, responseJson.username);
+                AsyncStorage.setItem(STORAGE_KEYID, responseJson.userkode);
                 signIn(responseJson.username);
-                // navigation.replace('DrawerNavigationRoutes');
-                setSpinner(false);
             } else {
                 setErrortext(responseJson.result);
                 Alert.alert('Invalid User!', 'Username or password is incorrect.', [
@@ -192,7 +192,7 @@ const SignInScreen = ({navigation}) => {
     if( Spinner ) {
         return(
         <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-            <ActivityIndicator size="large" color="#00ff00" />
+            <ActivityIndicator size="large" color="#1f65ff" />
         </View>
         );
     }
