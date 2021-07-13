@@ -101,6 +101,49 @@ export default class BookmarkScreen extends Component {
     
   }
 
+  approveHandle = (id_ap) => {
+
+    this.setState({ 
+      Spinner: true 
+    });
+
+    fetch('http://slcorp.or.id/api/prop/update_aproval.php', {  
+        method: 'POST',
+        headers: {
+            'Accept'        : 'application/json',
+            'Content-Type'  : 'application/json',
+        },
+        body: JSON.stringify({
+            database: this.state.valDb,
+            kodeuser: this.state.idUser,
+            tahaprov: this.state.stageApprvl,
+            kd_aprvl: id_ap
+        
+        })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //Hide Loader
+        console.log(responseJson);
+        // console.log(data.username);
+        
+        // If server response message same as Data Matched
+        if (responseJson.result) {
+            alert('Sukses!');
+            this.props.navigation.goBack();
+            // signIn(responseJson.username);
+        } else {
+            alert('Gagal!');
+            this.props.navigation.goBack();
+            return;
+        }
+    })
+    .catch((error) => {
+        //Hide Loader
+        console.error(error);
+    });
+  }
+
   render() {
     if( this.state.Spinner ) {
         return(
@@ -139,13 +182,13 @@ export default class BookmarkScreen extends Component {
                 <View style={styles.cardFooter}>
                   <View style={styles.socialBarContainer}>
                     <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => alert('di Setujui!')}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id)}>
                         <Icon name="shield-checkmark" size={25} color={'#4caf50'}></Icon>
                         <Text style={styles.socialBarLabel}>Setujui</Text>
                       </TouchableOpacity>
                     </View>
                     <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => alert('di Tolak!')}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.props.navigation.goBack()}>
                         <Icon name="close-circle" size={25} color={'#ff5252'}></Icon>
                         <Text style={styles.socialBarLabel}>Tolak</Text>
                       </TouchableOpacity>
