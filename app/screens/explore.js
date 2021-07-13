@@ -9,34 +9,29 @@ import {
   Alert,
   Image,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import ReduxThunk from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
 import reducers from '../reducers';
+import AsyncStorage from '@react-native-community/async-storage';
 // import ApprovalForm from '../components/ApprovalForm';
 // import { Header } from '../components/common';
 
 // const ExploreScreen = () => {
+const STORAGE_KEY         = '@save_db';
+const STORAGE_KEY_ID      = '@save_db_id';
 export default class ExploreScreen extends Component {
   // const { colors } = useTheme();
   
   constructor(props) {
     super(props);
     this.state = {
-      data: [
-        {id:1, day:'10', month: 'Sep', year: '2021'}, 
-        {id:2, day:'02', month: 'Jan', year: '2021'}, 
-        {id:3, day:'22', month: 'Aug', year: '2021'}, 
-        {id:4, day:'14', month: 'Dec', year: '2021'}, 
-        {id:5, day:'05', month: 'Jul', year: '2021'}, 
-        {id:6, day:'26', month: 'Oct', year: '2021'}, 
-        {id:7, day:'17', month: 'Sep', year: '2021'},
-        {id:8, day:'08', month: 'Jan', year: '2021'},
-        {id:9, day:'29', month: 'May', year: '2021'},
-      ],
+      data: [],
+      Spinner: true
     };
   }
 
@@ -44,7 +39,83 @@ export default class ExploreScreen extends Component {
     Alert.alert("alert", "event clicked");
   }
 
+  async componentDidMount() {
+    try {
+      const valDb = await AsyncStorage.getItem(STORAGE_KEY);
+      if (valDb !== null){
+        this.setState({
+          valDb: valDb
+        });
+        // console.log(valDb);
+      }
+      const idUser = await AsyncStorage.getItem(STORAGE_KEY_ID);
+      if (idUser !== null){
+        this.setState({
+          idUser: idUser
+        });
+        // console.log(idUser);
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+
+    await fetch('http://slcorp.or.id/api/prop/fetch_history.php', {  
+        method: 'POST',   
+        headers: {    
+          Accept: 'application/json',    
+          'Content-Type': 'application/json'  
+        },
+        body: JSON.stringify({
+          database: this.state.valDb,
+          kodeuser: this.state.idUser
+        })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //Hide Loader
+        console.log(this.state.idUser);
+        console.log(responseJson);
+            console.log(responseJson.result);
+        // console.log(data.username);
+        // If server response message same as Data Matched
+        if (responseJson.result) {
+            this.setState({ 
+              data: responseJson.data,
+              Spinner: false 
+            });
+            console.log(responseJson.data);
+
+        } else {
+            // setErrortext(responseJson.result);
+            this.setState({ 
+              Spinner: false 
+            });
+            alert('tidak ditemukan.');
+            console.log('null obsku');
+            // setSpinner(false);
+            return;
+        }
+    })
+    .catch((error) => {
+        //Hide Loader
+        this.setState({ 
+          Spinner: false 
+        });
+        console.error('e');
+        console.log(this.state.stageApprvl);
+        console.error(error);
+    });
+    
+  }
+
   render() {
+    if( this.state.Spinner ) {
+        return(
+        <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+            <ActivityIndicator size="large" color="#1f65ff" />
+        </View>
+        );
+    }
     return (
       <Provider store={createStore(reducers, {}, applyMiddleware(ReduxThunk))}>
           <View style={ styles.container }>
@@ -59,16 +130,18 @@ export default class ExploreScreen extends Component {
                   }}
                   renderItem={({item}) => {
                     return (
-                      <TouchableOpacity onPress={() => this.eventClickListener("row")}>
+                      <TouchableOpacity 
+                        //onPress={() => this.eventClickListener("row")}
+                      >
                         <View style={styles.eventBox}>
                           <View style={styles.eventDate}>
-                            <Text  style={styles.eventDay}>{item.day}</Text>
-                            <Text  style={styles.eventMonth}>{item.month} - {item.year}</Text>
+                            <Text  style={styles.eventDay}>{item.tanggal}</Text>
+                            <Text  style={styles.eventMonth}>{item.blnthn}</Text>
                           </View>
                           <View style={styles.eventContent}>
-                            <Text  style={styles.eventTime}>Status (Y/N) - Nominal</Text>
-                            <Text  style={styles.userName}>Nama - Depart</Text>
-                            <Text  style={styles.description}>Judul Pengajuan</Text>
+                            <Text  style={styles.eventTime}>{item.status} - {item.nominal}</Text>
+                            <Text  style={styles.userName}>{item.nama}</Text>
+                            <Text  style={styles.description}>{item.detail}</Text>
                           </View>
                         </View>
                       </TouchableOpacity>

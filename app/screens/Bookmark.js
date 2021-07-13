@@ -1,108 +1,120 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
-  Image,
-  Alert,
-  ScrollView,
   FlatList,
-  Button
+  ActivityIndicator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const STORAGE_KEY         = '@save_db';
-const STORAGE_KEYID       = '@save_db_id';
+const STORAGE_KEY_ID      = '@save_db_id';
 const STORAGE_KEY_APPRVL  = '@save_db_apprvl';
 
 export default class BookmarkScreen extends Component {
-
+  
   constructor(props) {
     super(props);
     this.state = {
-      data: []
+      data: [],
+      Spinner: true
     };
-    
-    const [valDb, setValDb] = useState(''); 
-    const [idUser, setValUser] = useState(''); 
-    const [stageApprvl, setValApprvl] = useState(''); 
-
-    useEffect(() => {
-        readData()
-    }, [])
-      
-    const readData = async () => {
-          try {
-              const valDb = await AsyncStorage.getItem(STORAGE_KEY)
-              const idUser = await AsyncStorage.getItem(STORAGE_KEYID)
-              const stageApprvl = await AsyncStorage.getItem(STORAGE_KEY_APPRVL)
-              if(valDb !== null) {
-                  setValDb(valDb)
-              }
-              if(idUser !== null) {
-                  setValUser(idUser)
-              }
-              if(stageApprvl !== null) {
-                  setValApprvl(stageApprvl)
-              }
-          } catch(e) {
-              navigation.navigate('Home')
-          }
-      }
   }
 
-  componentDidMount() {
-    fetch('http://slcorp.or.id/api/prop/fetch_aproval.php', {  
-        method: 'POST',
-        headers: {
-            'Accept'        : 'application/json',
-            'Content-Type'  : 'application/json',
+  async componentDidMount() {
+    try {
+      const valDb = await AsyncStorage.getItem(STORAGE_KEY);
+      if (valDb !== null){
+        this.setState({
+          valDb: valDb
+        });
+        // console.log(valDb);
+      }
+      const idUser = await AsyncStorage.getItem(STORAGE_KEY_ID);
+      if (idUser !== null){
+        this.setState({
+          idUser: idUser
+        });
+        // console.log(idUser);
+      }
+      const stageApprvl = await AsyncStorage.getItem(STORAGE_KEY_APPRVL);
+      if (stageApprvl !== null){
+        this.setState({
+          stageApprvl: stageApprvl
+        });
+        // console.log(stageApprvl);
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+
+    await fetch('http://slcorp.or.id/api/prop/fetch_aproval.php', {  
+        method: 'POST',   
+        headers: {    
+          Accept: 'application/json',    
+          'Content-Type': 'application/json'  
         },
         body: JSON.stringify({
-        
-            database: valDb, 
-            kodeuser: idUser, 
-            approval: stageApprvl
-        
+          database: this.state.valDb,
+          kodeuser: this.state.idUser,
+          approval: this.state.stageApprvl
         })
     })
-
     .then((response) => response.json())
     .then((responseJson) => {
         //Hide Loader
+        console.log(this.state.idUser);
         console.log(responseJson);
+            console.log(responseJson.result);
         // console.log(data.username);
-        
         // If server response message same as Data Matched
         if (responseJson.result) {
-            this.setState({ data: responseJson.data })
+            this.setState({ 
+              data: responseJson.data,
+              Spinner: false 
+            });
+            console.log(responseJson.data);
+
         } else {
-            setErrortext(responseJson.result);
-            Alert.alert('null.', [
-                {text: 'Okay'}
-            ]);
-            console.log('Username or password is incorrect');
-            setSpinner(false);
+            // setErrortext(responseJson.result);
+            this.setState({ 
+              Spinner: false 
+            });
+            alert('tidak ditemukan.');
+            console.log('null obsku');
+            // setSpinner(false);
             return;
         }
     })
     .catch((error) => {
         //Hide Loader
-        setSpinner(false);
+        this.setState({ 
+          Spinner: false 
+        });
+        console.error('e');
+        console.log(this.state.stageApprvl);
         console.error(error);
     });
     
   }
 
   render() {
+    if( this.state.Spinner ) {
+        return(
+        <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+            <ActivityIndicator size="large" color="#1f65ff" />
+        </View>
+        );
+    }
     return (
       <View style={styles.container}>
         <FlatList style={styles.list}
           data={this.state.data}
           keyExtractor= {(item) => {
-            return item.kode_dokumen;
+            return item.id;
           }}
           ItemSeparatorComponent={() => {
             return (
@@ -116,11 +128,11 @@ export default class BookmarkScreen extends Component {
                 {/* <Image style={styles.cardImage} source={{uri:item.image}}/> */}
                 <View style={styles.cardHeader}>
                   <View>
-                    <Text style={styles.title}>{item.kepada}</Text>
-                    <Text style={styles.description}>{item.debet_rp}</Text>
-                    <Text style={styles.description}>{item.catatan}</Text>
+                    <Text style={styles.title}>{item.nama}</Text>
+                    <Text style={styles.description}>{item.nominal}</Text>
+                    <Text style={styles.description}>{item.detail}</Text>
                     <View style={styles.timeContainer}>
-                      <Text style={styles.time}>{item.tgl_dokumen}</Text>
+                      <Text style={styles.time}>{item.tanggal}</Text>
                     </View>
                   </View>
                 </View>

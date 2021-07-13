@@ -44,7 +44,7 @@ const HomeScreen = ({navigation}) => {
       try {
           await AsyncStorage.setItem(STORAGE_KEY_APPRVL, stageApprvl)
           setValstageApprvl(stageApprvl);
-          alert(stageApprvl)
+        //   alert(stageApprvl)
           navigation.navigate('List-Proposal')
       } catch (e) {
           alert('Failed to save the data to the storager')

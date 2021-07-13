@@ -44,7 +44,7 @@ const SplashScreen = ({navigation}) => {
             if (valDb !== null) {
                 setValDb(valDb);
             }
-            alert(valDb);
+            alert('Pilih Entitas!');
         } catch (e) {
             alert('Failed to fetch the data from storage')
         }
@@ -103,10 +103,10 @@ const SplashScreen = ({navigation}) => {
             <Text style={styles.text}>Silahkan pilih salah satu departemen dibawah</Text>
             <View style={{marginTop: 25}}>
                 <View style={{flexDirection: 'row', backgroundColor: '#1976d2', borderBottomLeftRadius: 5, borderBottomRightRadius: 5}}>
-                    <PropayMenu name='DC' icon="cart-outline" nav={() => onSubmitEditing('DC')}/>
+                    {/* <PropayMenu name='DC' icon="pizza-outline" nav={() => onSubmitEditing('DC')}/> */}
                     <PropayMenu name='HO' icon="business-outline" nav={() => onSubmitEditing('HO')}/>
-                    <PropayMenu name='IC' icon="construct-outline" nav={() => onSubmitEditing('IC')}/>
-                    <PropayMenu name='PIZZA' icon="pizza-outline" nav={() => onSubmitEditing('PZ')}/>
+                    <PropayMenu name='IC/DC' icon="construct-outline" nav={() => onSubmitEditing('IC')}/>
+                    <PropayMenu name='Mini Plan' icon="cart-outline" nav={() => onSubmitEditing('PZ')}/>
                 </View>
             </View>
         </Animatable.View>
