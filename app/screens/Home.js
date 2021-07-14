@@ -44,7 +44,7 @@ const HomeScreen = ({navigation}) => {
       try {
           await AsyncStorage.setItem(STORAGE_KEY_APPRVL, stageApprvl)
           setValstageApprvl(stageApprvl);
-          alert(stageApprvl)
+        //   alert(stageApprvl)
           navigation.navigate('List-Proposal')
       } catch (e) {
           alert('Failed to save the data to the storager')
@@ -64,6 +64,7 @@ const HomeScreen = ({navigation}) => {
         <StatusBar barStyle= { theme.dark ? "light-content" : "dark-content" }/>
         <View style={styles.header}>
             <Text style={styles.text_header}>Selamat Datang!</Text>
+            <Text style={styles.text_desc}>Periksa dan Hati-hati sebelum melakukan konfirmasi</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
@@ -128,6 +129,12 @@ const styles = StyleSheet.create({
       color: '#fff',
       fontWeight: 'bold',
       fontSize: 30
+  },
+  text_desc: {
+      color: '#fff',
+      fontWeight: 'bold',
+      marginBottom:5,
+      marginTop:5
   },
   text_footer: {
       color: '#05375a',

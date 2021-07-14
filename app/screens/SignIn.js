@@ -201,9 +201,9 @@ const SignInScreen = ({navigation}) => {
         {/* <Loader loading={Spinner} /> */}
         <StatusBar backgroundColor='#1976d2' barStyle="light-content"/>
         <View style={styles.header}>
-            <Text style={styles.text_header}>Silahkan Login,</Text>
-            <Text style={styles.text_header}>Untuk Melanjutkan!</Text>
-            <Text style={styles.text_header}>Kode Entitas : {valDb}</Text>
+            <Text style={styles.text_header}>Pastikan anda awali dengan Bismillah,</Text>
+            <Text style={styles.text_header}>agar yang kita lakukan berkah!</Text>, 
+            <Text style={styles.text_header}>Login Entitas : {valDb}</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
