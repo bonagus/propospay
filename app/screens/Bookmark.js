@@ -101,8 +101,8 @@ export default class BookmarkScreen extends Component {
     
   }
 
-  approveHandle = (id_ap) => {
-
+  approveHandle = (id_ap, rp_ap, limit, stage) => {
+    // alert(id_ap+' '+rp_ap+' '+limit+' '+stage);
     this.setState({ 
       Spinner: true 
     });
@@ -116,9 +116,10 @@ export default class BookmarkScreen extends Component {
         body: JSON.stringify({
             database: this.state.valDb,
             kodeuser: this.state.idUser,
-            tahaprov: this.state.stageApprvl,
-            kd_aprvl: id_ap
-        
+            tahaprov: stage,
+            kd_aprvl: id_ap,
+            nominal : rp_ap,
+            usrlimit: limit
         })
     })
     .then((response) => response.json())
@@ -129,11 +130,11 @@ export default class BookmarkScreen extends Component {
         
         // If server response message same as Data Matched
         if (responseJson.result) {
-            alert('Sukses!');
+            alert(responseJson.message);
             this.props.navigation.goBack();
             // signIn(responseJson.username);
         } else {
-            alert('Gagal!');
+            alert(responseJson.message);
             this.props.navigation.goBack();
             return;
         }
@@ -182,7 +183,7 @@ export default class BookmarkScreen extends Component {
                 <View style={styles.cardFooter}>
                   <View style={styles.socialBarContainer}>
                     <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id)}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id, item.debet_rp, item.xlimit, item.appke )}>
                         <Icon name="shield-checkmark" size={25} color={'#4caf50'}></Icon>
                         <Text style={styles.socialBarLabel}>Setujui</Text>
                       </TouchableOpacity>
