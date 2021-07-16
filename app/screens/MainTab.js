@@ -44,6 +44,7 @@ const MainTabScreen = () => (
           tabBarIcon: ({ color }) => (
             <Icon name="search" color={color} size={26} />
           ),
+          unmountOnBlur:true
         }}
       />
       <Tab.Screen
@@ -130,7 +131,8 @@ const ExploreStackScreen = ({navigation}) => (
         <ExploreStack.Screen name="History" component={ExploreScreen} options={{
         headerLeft: () => (
             <Icon.Button name="home-sharp" size={25} backgroundColor="#1976d2" onPress={() => navigation.navigate("Home")}></Icon.Button>
-        )
+        ),
+        unmountOnBlur:true
         }} />
 </ExploreStack.Navigator>
 );

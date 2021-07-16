@@ -20,7 +20,7 @@ const STORAGE_KEY_APPRVL = '@save_db_apprvl';
 
 const PropayMenu2 = props => {
   return (
-    <View style={{width: `${100/4}%`, alignItems: 'center'}}>
+    <View style={{width: `${100/3}%`, alignItems: 'center'}}>
       <TouchableOpacity onPress={props.onPress}>
         <View style={{height: 58, width: 58, borderWidth: 1, borderColor: 'lightgrey', borderRadius: 18, justifyContent:'center', alignItems: 'center'}}>
           <Image source={props.image}/>
@@ -64,6 +64,7 @@ const HomeScreen = ({navigation}) => {
         <StatusBar barStyle= { theme.dark ? "light-content" : "dark-content" }/>
         <View style={styles.header}>
             <Text style={styles.text_header}>Selamat Datang!</Text>
+            <Text style={styles.text_desc}>Periksa dan Hati-hati sebelum melakukan konfirmasi</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
@@ -74,13 +75,13 @@ const HomeScreen = ({navigation}) => {
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Cepat!</Text>
           <Text style={styles.text}>Pilih salah satu tipe approval dibawah.</Text>    
           <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 18}}>
-            <PropayMenu2 name='Belum Approval' image={require('../assets/icon/go-more.png')} onPress={() => onSelectApprvl('0')}/>
+            {/* <PropayMenu2 name='Belum Approval' image={require('../assets/icon/go-more.png')} onPress={() => onSelectApprvl('0')}/> */}
             <PropayMenu2 name='Approval 1' image={require('../assets/icon/go-deals.png')} onPress={() => onSelectApprvl('1')}/>
             <PropayMenu2 name='Approval 2' image={require('../assets/icon/promo.png')} onPress={() => onSelectApprvl('2')}/>
             <PropayMenu2 name='Approval 3' image={require('../assets/icon/go-send.png')} onPress={() => onSelectApprvl('3')}/>
           </View>
           <View style={{height: 5, marginTop: 50}}></View>
-          <Text style={[styles.title, { color: colors.text }]}>Pencarian Detail!</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Pencarian Dengan Nomor Dokumen!</Text>
           <Text style={styles.text}>Klik tombol untuk melakukan pencarian dengan filter.</Text>   
           <View style={styles.button}>
             <TouchableOpacity onPress={()=>{navigation.navigate('Search')}}>
@@ -128,6 +129,12 @@ const styles = StyleSheet.create({
       color: '#fff',
       fontWeight: 'bold',
       fontSize: 30
+  },
+  text_desc: {
+      color: '#fff',
+      fontWeight: 'bold',
+      marginBottom:5,
+      marginTop:5
   },
   text_footer: {
       color: '#05375a',

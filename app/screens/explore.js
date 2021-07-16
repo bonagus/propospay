@@ -10,6 +10,8 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  ScrollView,
+  RefreshControl,
   ActivityIndicator
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
@@ -31,12 +33,69 @@ export default class ExploreScreen extends Component {
     super(props);
     this.state = {
       data: [],
-      Spinner: true
+      Spinner: false,
+      refreshing: true
     };
   }
 
   eventClickListener = (viewId) => {
     Alert.alert("alert", "event clicked");
+  }
+  
+  onRefresh = () => {
+    this.setState({
+      refreshing: true
+    });
+    this.wait();
+  }
+
+  wait = () => {
+    fetch('http://slcorp.or.id/api/prop/fetch_history.php', {  
+        method: 'POST',   
+        headers: {    
+          Accept: 'application/json',    
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({
+          database: this.state.valDb,
+          kodeuser: this.state.idUser
+        })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //Hide Loader
+        console.log(this.state.idUser);
+        console.log(responseJson);
+            console.log(responseJson.result);
+        // console.log(data.username);
+        // If server response message same as Data Matched
+        if (responseJson.result) {
+            this.setState({ 
+              data: responseJson.data,
+              refreshing: false 
+            });
+            console.log(responseJson.data);
+
+        } else {
+            // setErrortext(responseJson.result);
+            this.setState({ 
+              refreshing: false 
+            });
+            alert('tidak ditemukan.');
+            console.log('null obsku');
+            // setSpinner(false);
+            return;
+        }
+    })
+    .catch((error) => {
+        //Hide Loader
+        this.setState({ 
+          refreshing: false 
+        });
+        console.error('e');
+        console.log(this.state.stageApprvl);
+        console.error(error);
+    });
   }
 
   async componentDidMount() {
@@ -63,7 +122,7 @@ export default class ExploreScreen extends Component {
         method: 'POST',   
         headers: {    
           Accept: 'application/json',    
-          'Content-Type': 'application/json'  
+          'Content-Type': 'application/json' 
         },
         body: JSON.stringify({
           database: this.state.valDb,
@@ -81,14 +140,14 @@ export default class ExploreScreen extends Component {
         if (responseJson.result) {
             this.setState({ 
               data: responseJson.data,
-              Spinner: false 
+              refreshing: false 
             });
             console.log(responseJson.data);
 
         } else {
             // setErrortext(responseJson.result);
             this.setState({ 
-              Spinner: false 
+              refreshing: false 
             });
             alert('tidak ditemukan.');
             console.log('null obsku');
@@ -99,7 +158,7 @@ export default class ExploreScreen extends Component {
     .catch((error) => {
         //Hide Loader
         this.setState({ 
-          Spinner: false 
+          refreshing: false 
         });
         console.error('e');
         console.log(this.state.stageApprvl);
@@ -109,16 +168,11 @@ export default class ExploreScreen extends Component {
   }
 
   render() {
-    if( this.state.Spinner ) {
-        return(
-        <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-            <ActivityIndicator size="large" color="#1f65ff" />
-        </View>
-        );
-    }
     return (
       <Provider store={createStore(reducers, {}, applyMiddleware(ReduxThunk))}>
-          <View style={ styles.container }>
+          <View 
+            style={ styles.container }
+          >
               {/* <Header headerText="Time Approval" />
               <ApprovalForm /> */}
                <FlatList 
@@ -128,6 +182,8 @@ export default class ExploreScreen extends Component {
                   keyExtractor= {(item) => {
                     return item.id;
                   }}
+                  refreshing={this.state.refreshing}
+                  onRefresh={this.onRefresh}
                   renderItem={({item}) => {
                     return (
                       <TouchableOpacity 

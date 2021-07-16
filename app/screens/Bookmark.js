@@ -101,8 +101,8 @@ export default class BookmarkScreen extends Component {
     
   }
 
-  approveHandle = (id_ap) => {
-
+  approveHandle = (id_ap, rp_ap, limit, stage) => {
+    // alert(id_ap+' '+rp_ap+' '+limit+' '+stage);
     this.setState({ 
       Spinner: true 
     });
@@ -116,9 +116,10 @@ export default class BookmarkScreen extends Component {
         body: JSON.stringify({
             database: this.state.valDb,
             kodeuser: this.state.idUser,
-            tahaprov: this.state.stageApprvl,
-            kd_aprvl: id_ap
-        
+            tahaprov: stage,
+            kd_aprvl: id_ap,
+            nominal : rp_ap,
+            usrlimit: limit
         })
     })
     .then((response) => response.json())
@@ -129,11 +130,11 @@ export default class BookmarkScreen extends Component {
         
         // If server response message same as Data Matched
         if (responseJson.result) {
-            alert('Sukses!');
+            alert(responseJson.message);
             this.props.navigation.goBack();
             // signIn(responseJson.username);
         } else {
-            alert('Gagal!');
+            alert(responseJson.message);
             this.props.navigation.goBack();
             return;
         }
@@ -171,8 +172,9 @@ export default class BookmarkScreen extends Component {
                 {/* <Image style={styles.cardImage} source={{uri:item.image}}/> */}
                 <View style={styles.cardHeader}>
                   <View>
-                    <Text style={styles.title}>{item.nama}</Text>
-                    <Text style={styles.description}>{item.nominal}</Text>
+                    <Text style={styles.title}>{item.dokumen} | {item.nama}</Text>
+                    <Text style={styles.description}>{item.nominal} | {item.status}</Text>
+                    <Text style={styles.description}>{item.relasi} | {item.dept} | </Text>
                     <Text style={styles.description}>{item.detail}</Text>
                     <View style={styles.timeContainer}>
                       <Text style={styles.time}>{item.tanggal}</Text>
@@ -182,17 +184,17 @@ export default class BookmarkScreen extends Component {
                 <View style={styles.cardFooter}>
                   <View style={styles.socialBarContainer}>
                     <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id)}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id, item.debet_rp, item.xlimit, item.appke )}>
                         <Icon name="shield-checkmark" size={25} color={'#4caf50'}></Icon>
                         <Text style={styles.socialBarLabel}>Setujui</Text>
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.socialBarSection}>
+                    {/* <View style={styles.socialBarSection}>
                       <TouchableOpacity style={styles.socialBarButton} onPress={() => this.props.navigation.goBack()}>
                         <Icon name="close-circle" size={25} color={'#ff5252'}></Icon>
-                        <Text style={styles.socialBarLabel}>Tolak</Text>
+                        <Text style={styles.socialBarLabel}>Batal | Kembali</Text>
                       </TouchableOpacity>
-                    </View>
+                    </View> */}
                   </View>
                 </View>
               </View>

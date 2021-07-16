@@ -70,7 +70,7 @@ const SignInScreen = ({navigation}) => {
     const { signIn } = React.useContext(AuthContext);
 
     const textInputChange = (val) => {
-        if( val.trim().length >= 4 ) {
+        if( val.trim().length >= 3 ) {
             setData({
                 ...data,
                 username: val,
@@ -111,7 +111,7 @@ const SignInScreen = ({navigation}) => {
     }
 
     const handleValidUser = (val) => {
-        if( val.trim().length >= 4 ) {
+        if( val.trim().length >= 3 ) {
             setData({
                 ...data,
                 isValidUser: true
@@ -201,9 +201,8 @@ const SignInScreen = ({navigation}) => {
         {/* <Loader loading={Spinner} /> */}
         <StatusBar backgroundColor='#1976d2' barStyle="light-content"/>
         <View style={styles.header}>
-            <Text style={styles.text_header}>Silahkan Login,</Text>
-            <Text style={styles.text_header}>Untuk Melanjutkan!</Text>
-            <Text style={styles.text_header}>Kode Entitas : {valDb}</Text>
+            <Text style={styles.text_header}>Awali dengan Bismillah,</Text>
+            <Text style={styles.text_header}>Login Entitas : {valDb}</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
@@ -244,7 +243,7 @@ const SignInScreen = ({navigation}) => {
             </View>
             { data.isValidUser ? null : 
             <Animatable.View animation="fadeInLeft" duration={500}>
-            <Text style={styles.errorMsg}>Username must be 4 characters long.</Text>
+            <Text style={styles.errorMsg}>Username must be 3 characters long.</Text>
             </Animatable.View>
             }
             
@@ -350,7 +349,7 @@ const styles = StyleSheet.create({
     text_header: {
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 30
+        fontSize: 25
     },
     text_footer: {
         color: '#05375a',

@@ -8,46 +8,201 @@ import {
   Image,
   Alert,
   ScrollView,
+  Modal,
   FlatList,
+  ActivityIndicator,
   Button
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-community/async-storage';
+import { black } from 'react-native-paper/lib/typescript/styles/colors';
 
+const STORAGE_KEY         = '@save_db';
+const STORAGE_KEY_ID      = '@save_db_id';
 class DetailsScreen extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {search: ''};
     this.state = {
       data: [
-        {id:1, title: "Lorem ipsum dolor",                  time:"2018-08-01 12:15 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean  ligula..."},
-        // {id:2, title: "Sit amet, consectetuer",             time:"2018-08-12 12:00 pm", nominal:"5000000", description:"Lorem  dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula..."} ,
-        // {id:3, title: "Dipiscing elit. Aenean ",            time:"2017-08-05 12:21 pm", nominal:"5000000", description:"Lorem ipsum dolor sit , consectetuer  elit. Aenean commodo ligula..."}, 
-        // {id:4, title: "Commodo ligula eget dolor.",         time:"2015-08-12 12:00 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula..."}, 
-        // {id:5, title: "Aenean massa. Cum sociis",           time:"2013-06-12 12:11 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  commodo ligula..."}, 
-        // {id:6, title: "Natoque penatibus et magnis",        time:"2018-08-12 12:56 pm", nominal:"5000000", description:"Lorem ipsum  sit amet, consectetuer adipiscing elit. Aenean commodo ligula..."}, 
-        // {id:7, title: "Dis parturient montes, nascetur",    time:"2018-08-12 12:33 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula..."}, 
-        // {id:8, title: "Ridiculus mus. Donec quam",          time:"2018-06-12 12:44 pm", nominal:"5000000", description:"Lorem ipsum  sit amet, consectetuer adipiscing elit.  commodo ligula..."},
-        // {id:9, title: "Felis, ultricies nec, pellentesque", time:"2012-07-12 12:23 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer  elit. Aenean commodo ligula..."},
-      ]
+        // {id:1, title: "Lorem ipsum dolor",                  time:"2018-08-01 12:15 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean  ligula..."},
+      ],
+      Spinner: false 
     };
   }
 
-  onClickListener = (viewId) => {
-    Alert.alert("Alert", "Button pressed "+viewId);
+  async componentDidMount() {
+    try {
+      const valDb = await AsyncStorage.getItem(STORAGE_KEY);
+      if (valDb !== null){
+        this.setState({
+          valDb: valDb
+        });
+        // console.log(valDb);
+      }
+      const idUser = await AsyncStorage.getItem(STORAGE_KEY_ID);
+      if (idUser !== null){
+        this.setState({
+          idUser: idUser
+        });
+        // console.log(idUser);
+      }
+    } catch (error) {
+      // Error retrieving data
+    } 
+  }
+
+  cariNoDok = (kode_dokumen) => {
+    // Alert.alert("Alert", "Button pressed "+this.state.idUser);
+    // return; 
+    // let check = kode_dokumen.length;
+
+    // alert(kode_dokumen); return;
+
+    if ( !kode_dokumen || kode_dokumen.length < 5 ) {
+        Alert.alert('Data Kurang Valid!', 'Minimal Masukan 5 Digit Terahir Dokumen Approval.', [
+            {text: 'Okay'}
+        ]);
+        return;
+    }
+    this.setState({ 
+      Spinner: true 
+    });
+
+    fetch('http://slcorp.or.id/api/prop/search_aproval.php', {  
+        method: 'POST',
+        headers: {
+            'Accept'        : 'application/json',
+            'Content-Type'  : 'application/json',
+        },
+        body: JSON.stringify({
+            database: this.state.valDb,
+            kodeuser: this.state.idUser,
+            kodedoku: kode_dokumen
+        })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //Hide Loader
+        console.log(responseJson);
+        // console.log(data.username);
+        
+        // If server response message same as Data Matched
+        if (responseJson.result) {
+            this.setState({ 
+              data: responseJson.data,
+              Spinner: false 
+            });
+            console.log(responseJson.data);
+          
+        } else {
+            this.setState({ 
+              Spinner: false 
+            });
+            alert(responseJson.message);
+            return;
+        }
+    })
+    .catch((error) => {
+        //Hide Loader
+        console.error(error);
+    });
+  }
+  componentWillUnmount () {
+    this.setState({ 
+      data: '',
+      search: '' 
+    });
+  }
+
+  approveHandle = (id_ap, rp_ap, limit, stage, status, can_apr, otoritas, crosappr, dokumen) => {
+    // alert(id_ap+' '+rp_ap+' '+limit+' '+stage+' '+status+' '+can_apr+' '+otoritas+' '+crosappr);
+    // return;
+    this.setState({
+      Spinner: true
+    });
+
+    fetch('http://slcorp.or.id/api/prop/advanced_update.php', {  
+        method: 'POST',
+        headers: {
+            'Accept'        : 'application/json',
+            'Content-Type'  : 'application/json',
+        },
+        body: JSON.stringify({
+            database: this.state.valDb,
+            kodeuser: this.state.idUser,
+            tahaprov: stage,
+            kd_aprvl: id_ap,
+            nominal : rp_ap,
+            usrlimit: limit,
+            status  : status,
+            can_apr : can_apr,
+            otoritas: otoritas,
+            crosappr: crosappr
+        })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //Hide Loader
+        console.log(responseJson);
+        // console.log(data.username);
+        
+        // If server response message same as Data Matched
+        if (responseJson.result) {
+            alert(responseJson.message);
+            // this.props.navigation.goBack();
+            this.cariNoDok(dokumen);
+            // signIn(responseJson.username);
+        } else {
+            this.setState({
+              Spinner: false
+            });
+            alert(responseJson.message);
+            // this.props.navigation.goBack();
+            return;
+        }
+    })
+    .catch((error) => {
+        //Hide Loader
+        console.error(error);
+    });
   }
 
   render() {
+    if( this.state.Spinner ) {
+        return(
+        <Modal
+          transparent={true}
+          animationType={'none'}
+          visible={this.state.Spinner}
+          onRequestClose={() => {console.log('close modal')}}>
+          <View style={styles.modalBackground}>
+            <View style={styles.activityIndicatorWrapper}>
+              <ActivityIndicator
+                animating={this.state.Spinner} size="large" color="#1f65ff" />
+            </View>
+          </View>
+        </Modal>
+        );
+    }
     return (
       <View style={styles.container}>
         <View style={styles.formContent}>
           <View style={styles.inputContainer}>
-            <Image style={[styles.icon, styles.inputIcon]} source={{uri: 'https://png.icons8.com/search/androidL/100/000000'}}/>
             <TextInput style={styles.inputs}
                 ref={'txtPassword'}
-                placeholder="Search"
+                placeholder="Nomor Dokumen Proposal"
+                keyboardType = 'numeric'
                 underlineColorAndroid='transparent'
-                onChangeText={(title) => this.setState({title})}/>
+                onChangeText={(search) => this.setState({search})}/>
           </View>
+          <TouchableOpacity style={styles.saveButton} onPress={() => this.cariNoDok(this.state.search)}>
+            <Image 
+              style={[styles.icon, styles.iconBtnSearch]} 
+              source={require('../assets/search--v3.png')}
+            />
+          </TouchableOpacity>
         </View>
         <FlatList style={styles.list}
           data={this.state.data}
@@ -66,30 +221,27 @@ class DetailsScreen extends Component {
                 {/* <Image style={styles.cardImage} source={{uri:item.image}}/> */}
                 <View style={styles.cardHeader}>
                   <View>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.description}>Nama - Depart</Text>
-                    <Text style={styles.description}>{item.description}</Text>
+                    <Text style={styles.title}>{item.dokumen} | {item.status}</Text>
+                    <Text style={styles.description}>{item.nominal}</Text>
+                    <Text style={styles.description}>{item.nama} | {item.dept} | {item.relasi}</Text>
+                    <Text style={styles.description}>{item.detail}</Text>
                     <View style={styles.timeContainer}>
-                      <Text style={styles.time}>{item.time}</Text>
+                      <Text style={styles.time}>{item.tanggal}</Text>
                     </View>
                   </View>
                 </View>
+                { item.status == "Approval Selesai" ? null : 
                 <View style={styles.cardFooter}>
                   <View style={styles.socialBarContainer}>
                     <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => alert('di Setujui!')}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id, item.debet_rp, item.xlimit, item.approvalke, item.status, item.aprovenya, item.otoritas, item.crosaprove, item.dokumen )}>
                         <Icon name="shield-checkmark" size={25} color={'#4caf50'}></Icon>
                         <Text style={styles.socialBarLabel}>Setujui</Text>
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => alert('di Tolak!')}>
-                        <Icon name="close-circle" size={25} color={'#ff5252'}></Icon>
-                        <Text style={styles.socialBarLabel}>Tolak</Text>
-                      </TouchableOpacity>
-                    </View>
                   </View>
                 </View>
+                }
               </View>
             )
           }}/>
@@ -110,29 +262,44 @@ const styles = StyleSheet.create({
   inputContainer: {
       borderBottomColor: '#F5FCFF',
       backgroundColor: '#FFFFFF',
-      borderRadius:30,
+      borderRadius:10,
       borderBottomWidth: 1,
       height:45,
       flexDirection: 'row',
       alignItems:'center',
       flex:1,
-      margin:10,
+      margin:5
   },
   icon:{
     width:30,
     height:30,
+  },
+  saveButton: {
+    height:45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin:5,
+    width:35,
+    alignSelf: 'flex-end',
+    backgroundColor: '#FFFFFF',
+    borderRadius:10,
+  },
+  saveButtonText: {
+    color: 'white',
   },
   iconBtnSearch:{
     alignSelf:'center'
   },
   inputs:{
       height:45,
-      marginLeft:16,
+      marginLeft:15,
+      alignSelf:'center',
       borderBottomColor: '#FFFFFF',
       flex:1,
+      color: '#000000',
+      textDecorationColor: '#000000'
   },
   inputIcon:{
-    marginLeft:15,
     justifyContent: 'center'
   },
   list: {
@@ -231,6 +398,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalBackground: {
+      flex: 1,
+      alignItems: 'center',
+      flexDirection: 'column',
+      justifyContent: 'space-around',
+      backgroundColor: '#00000040'
+  },
+  activityIndicatorWrapper: {
+      backgroundColor: '#FFFFFF',
+      height: 100,
+      width: 100,
+      borderRadius: 10,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-around'
   }
 });
 

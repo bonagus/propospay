@@ -100,13 +100,13 @@ const SplashScreen = ({navigation}) => {
             <Text style={[styles.title, {
                 color: colors.text
             }]}>Proposal Approval!</Text>
-            <Text style={styles.text}>Silahkan pilih salah satu departemen dibawah</Text>
+            <Text style={styles.text}>Silahkan pilih salah satu entitas dibawah</Text>
             <View style={{marginTop: 25}}>
                 <View style={{flexDirection: 'row', backgroundColor: '#1976d2', borderBottomLeftRadius: 5, borderBottomRightRadius: 5}}>
                     {/* <PropayMenu name='DC' icon="pizza-outline" nav={() => onSubmitEditing('DC')}/> */}
                     <PropayMenu name='HO' icon="business-outline" nav={() => onSubmitEditing('HO')}/>
                     <PropayMenu name='IC/DC' icon="construct-outline" nav={() => onSubmitEditing('IC')}/>
-                    <PropayMenu name='Mini Plan' icon="cart-outline" nav={() => onSubmitEditing('PZ')}/>
+                    <PropayMenu name='Mini Plan' icon="cart-outline" nav={() => onSubmitEditing('MP')}/>
                 </View>
             </View>
         </Animatable.View>
