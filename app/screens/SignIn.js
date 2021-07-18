@@ -140,7 +140,7 @@ const SignInScreen = ({navigation}) => {
             return;
         }
 
-        fetch('http://slcorp.or.id/api/prop/login.php', {  
+        fetch('https://url.for/login.php', {  
             method: 'POST',
             headers: {
                 'Accept'        : 'application/json',

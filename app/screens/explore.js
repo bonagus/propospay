@@ -50,7 +50,7 @@ export default class ExploreScreen extends Component {
   }
 
   wait = () => {
-    fetch('http://slcorp.or.id/api/prop/fetch_history.php', {  
+    fetch('https://url.for/fetch_history.php', {  
         method: 'POST',   
         headers: {    
           Accept: 'application/json',    
@@ -118,7 +118,7 @@ export default class ExploreScreen extends Component {
       // Error retrieving data
     }
 
-    await fetch('http://slcorp.or.id/api/prop/fetch_history.php', {  
+    await fetch('https://url.for/fetch_history.php', {  
         method: 'POST',   
         headers: {    
           Accept: 'application/json',    

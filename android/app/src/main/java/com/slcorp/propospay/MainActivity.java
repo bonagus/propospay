@@ -1,4 +1,4 @@
-package com.propospay;
+package com.slcorp.propospay;
 
 import com.facebook.react.ReactActivity;
 

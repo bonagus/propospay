@@ -70,7 +70,7 @@ class DetailsScreen extends Component {
       Spinner: true 
     });
 
-    fetch('http://slcorp.or.id/api/prop/search_aproval.php', {  
+    fetch('https://url.for/search_aproval.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
@@ -123,7 +123,7 @@ class DetailsScreen extends Component {
       Spinner: true
     });
 
-    fetch('http://slcorp.or.id/api/prop/advanced_update.php', {  
+    fetch('https://url.for/advanced_update.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',

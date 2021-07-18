@@ -51,7 +51,7 @@ export default class BookmarkScreen extends Component {
       // Error retrieving data
     }
 
-    await fetch('http://slcorp.or.id/api/prop/fetch_aproval.php', {  
+    await fetch('https://url.for/fetch_aproval.php', {  
         method: 'POST',   
         headers: {    
           Accept: 'application/json',    
@@ -107,7 +107,7 @@ export default class BookmarkScreen extends Component {
       Spinner: true 
     });
 
-    fetch('http://slcorp.or.id/api/prop/update_aproval.php', {  
+    fetch('https://url.for/update_aproval.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
