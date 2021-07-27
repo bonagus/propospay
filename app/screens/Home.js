@@ -84,7 +84,7 @@ const HomeScreen = ({navigation}) => {
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Dengan Nomor Dokumen!</Text>
           <Text style={styles.text}>Klik tombol untuk melakukan pencarian dengan filter.</Text>   
           <View style={styles.button}>
-            <TouchableOpacity onPress={()=>{navigation.navigate('Search')}}>
+            <TouchableOpacity onPress={()=>{navigation.navigate('Trial')}}>
                 <LinearGradient
                     colors={['#1976d2', '#2196f3']}
                     style={styles.signIn}

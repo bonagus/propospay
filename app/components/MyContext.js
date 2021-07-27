@@ -4,7 +4,7 @@ import axios from 'axios'
 export const AuthContext = React.createContext();
 
 const Axios = axios.create({
-    baseURL: 'http://slcorp.or.id/api/propospay/',
+    baseURL: 'https://slcorp.or.id/api/propospay/',
 });
 
 class Context extends Component{

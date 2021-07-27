@@ -111,7 +111,7 @@ const SignInScreen = ({navigation}) => {
     }
 
     const handleValidUser = (val) => {
-        if( val.trim().length >= 4 ) {
+        if( val.trim().length >= 3 ) {
             setData({
                 ...data,
                 isValidUser: true
@@ -140,7 +140,7 @@ const SignInScreen = ({navigation}) => {
             return;
         }
 
-        fetch('http://slcorp.or.id/api/prop/login.php', {  
+        fetch('https://slcorp.or.id/api/prop/login.php', {  
             method: 'POST',
             headers: {
                 'Accept'        : 'application/json',

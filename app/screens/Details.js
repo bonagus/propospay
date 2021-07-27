@@ -15,24 +15,31 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-community/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const STORAGE_KEY         = '@save_db';
 const STORAGE_KEY_ID      = '@save_db_id';
+const moment              = require('moment');
+
 class DetailsScreen extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {search: ''};
+    this.state = {
+      vals          : new Date(),
+      showDatePicker: false,
+      search        : '',
+    };
     this.state = {
       data: [
-        // {id:1, title: "Lorem ipsum dolor",                  time:"2018-08-01 12:15 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean  ligula..."},
+        // {id:1, title: "Lorem ipsum dolor", time:"2018-08-01 12:15 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean  ligula..."},
       ],
       Spinner: false 
     };
   }
 
   async componentDidMount() {
-    try {
+    try { 
       const valDb = await AsyncStorage.getItem(STORAGE_KEY);
       if (valDb !== null){
         this.setState({
@@ -55,11 +62,20 @@ class DetailsScreen extends Component {
   cariNoDok = (kode_dokumen) => {
     // Alert.alert("Alert", "Button pressed "+this.state.idUser);
     // return; 
+    // let check = kode_dokumen.length;
+    // alert(kode_dokumen); return;
+
+    if ( !kode_dokumen || kode_dokumen.length < 5 ) {
+        Alert.alert('Data Kurang Valid!', 'Minimal Masukan 5 Digit Terahir Dokumen Approval.', [
+            {text: 'Okay'}
+        ]);
+        return;
+    }
     this.setState({ 
       Spinner: true 
     });
 
-    fetch('http://slcorp.or.id/api/prop/search_aproval.php', {  
+    fetch('https://slcorp.or.id/api/prop/search_aproval.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
@@ -98,6 +114,7 @@ class DetailsScreen extends Component {
         console.error(error);
     });
   }
+
   componentWillUnmount () {
     this.setState({ 
       data: '',
@@ -105,13 +122,35 @@ class DetailsScreen extends Component {
     });
   }
 
-  approveHandle = (id_ap, rp_ap, limit, stage, status, can_apr, otoritas, crosappr) => {
-    // alert(id_ap+' '+rp_ap+' '+limit+' '+stage);
+  
+  cariProp = async () => {
+    /*
+    this.setState({spinner:true})
+    const url = 'http://slcorp.or.id/hrdapp/1.php?kode_kry='+kode_kry+'&bulan='+this.state.facilityId+'&tahun='+this.state.selectedyear_id;
+    console.log(url)
+    return fetch(url)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            this.setState({
+                data: responseJson,
+                isLoading: false,
+                spinner :false
+            });
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    */
+  };
+
+  approveHandle = (id_ap, rp_ap, limit, stage, status, can_apr, otoritas, crosappr, dokumen) => {
+    // alert(id_ap+' '+rp_ap+' '+limit+' '+stage+' '+status+' '+can_apr+' '+otoritas+' '+crosappr);
+    // return;
     this.setState({
-      Spinner: true 
+      Spinner: true
     });
 
-    fetch('http://slcorp.or.id/api/prop/advanced_update.php', {  
+    fetch('https://slcorp.or.id/api/prop/advanced_update.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
@@ -139,11 +178,15 @@ class DetailsScreen extends Component {
         // If server response message same as Data Matched
         if (responseJson.result) {
             alert(responseJson.message);
-            this.props.navigation.goBack();
+            // this.props.navigation.goBack();
+            this.cariNoDok(dokumen);
             // signIn(responseJson.username);
         } else {
+            this.setState({
+              Spinner: false
+            });
             alert(responseJson.message);
-            this.props.navigation.goBack();
+            // this.props.navigation.goBack();
             return;
         }
     })
@@ -170,20 +213,75 @@ class DetailsScreen extends Component {
         </Modal>
         );
     }
+    
+    const showDatePicker = this.state.showDatePicker ?
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={this.state.vals}
+            mode="date"
+            // is24Hour={true}
+            display="default"
+            onChange={(vals)=>this.setState({vals})}
+          /> : <View />
+
     return (
       <View style={styles.container}>
         <View style={styles.formContent}>
+            {/* <Picker
+                selectedValue={this.state.facilityId}
+                style={{ width: '40%' }}
+                onValueChange={(itemValue) =>this.setState({ facilityId: itemValue, facilityPicked: true })}
+                >
+                {this.options.map((facility, i) => {
+                    return <Picker.Item key={i} value={facility.value} label={facility.label} />
+                })}
+            </Picker>
+            <Picker
+                selectedValue={this.state.selectedyear_id}
+                style={{ width: '40%' }}
+                onValueChange={(itemValue) => this.setState({ selectedyear_id: itemValue, selectedyear_Picked: true })}
+            >
+                {arryear.map((tahun,i) => {
+                    return <Picker.Item key={i} value={tahun.value} label={tahun.label.toString()} />
+
+                })}
+                
+            </Picker>
+            
+          <TouchableOpacity 
+            style={{height: 40, width: 300, padding: 4, borderColor: 'gray', borderWidth: 1}} 
+            onPress={() => this.setState({showDatePicker: !this.state.showDatePicker})}>
+            <Text>{moment(this.state.vals).format('DD/MM/YYYY')}</Text>
+          </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={this.cariProp}
+            >
+              <Icon name='search' style={{ color:'black' }}/>
+            </TouchableOpacity> */}
           <View style={styles.inputContainer}>
             <TextInput style={styles.inputs}
                 ref={'txtPassword'}
-                placeholder="Nomor Dokumen Proposal"
+                placeholder="Tanggal Awal"
+                value={moment(this.state.vals).format('DD/MM/YYYY')}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput style={styles.inputs}
+                ref={'txtPassword'}
+                placeholder="Tanggal Akhir"
+                keyboardType = 'numeric'
                 underlineColorAndroid='transparent'
                 onChangeText={(search) => this.setState({search})}/>
           </View>
           <TouchableOpacity style={styles.saveButton} onPress={() => this.cariNoDok(this.state.search)}>
-            <Image style={[styles.icon, styles.iconBtnSearch]} source={{uri: 'https://img.icons8.com/ios-filled/50/000000/search--v3.png'}}/>
+            <Image 
+              style={[styles.icon, styles.iconBtnSearch]} 
+              source={require('../assets/search--v3.png')}
+            />
           </TouchableOpacity>
-        </View>
+          {showDatePicker}
+        </View>  
         <FlatList style={styles.list}
           data={this.state.data}
           keyExtractor= {(item) => {
@@ -203,23 +301,25 @@ class DetailsScreen extends Component {
                   <View>
                     <Text style={styles.title}>{item.dokumen} | {item.status}</Text>
                     <Text style={styles.description}>{item.nominal}</Text>
-                    <Text style={styles.description}>{item.nama} - {item.dept} - {item.relasi}</Text>
+                    <Text style={styles.description}>{item.nama} | {item.dept} | {item.relasi}</Text>
                     <Text style={styles.description}>{item.detail}</Text>
                     <View style={styles.timeContainer}>
                       <Text style={styles.time}>{item.tanggal}</Text>
                     </View>
                   </View>
                 </View>
+                { item.status == "Approval Selesai" ? null : 
                 <View style={styles.cardFooter}>
                   <View style={styles.socialBarContainer}>
                     <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id, item.debet_rp, item.xlimit, item.approvalke, item.status, item.aprovenya, item.otoritas, item.crosaprove )}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id, item.debet_rp, item.xlimit, item.approvalke, item.status, item.aprovenya, item.otoritas, item.crosaprove, item.dokumen )}>
                         <Icon name="shield-checkmark" size={25} color={'#4caf50'}></Icon>
                         <Text style={styles.socialBarLabel}>Setujui</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
                 </View>
+                }
               </View>
             )
           }}/>
@@ -237,6 +337,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop:1,
   },
+  button: {
+    alignItems: "center",
+    backgroundColor: "#DDDDDD",
+    padding: 10
+  },
   inputContainer: {
       borderBottomColor: '#F5FCFF',
       backgroundColor: '#FFFFFF',
@@ -246,7 +351,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems:'center',
       flex:1,
-      margin:5,
+      margin:5
   },
   icon:{
     width:30,
@@ -274,6 +379,8 @@ const styles = StyleSheet.create({
       alignSelf:'center',
       borderBottomColor: '#FFFFFF',
       flex:1,
+      color: '#000000',
+      textDecorationColor: '#000000'
   },
   inputIcon:{
     justifyContent: 'center'

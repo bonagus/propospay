@@ -51,7 +51,7 @@ export default class BookmarkScreen extends Component {
       // Error retrieving data
     }
 
-    await fetch('http://slcorp.or.id/api/prop/fetch_aproval.php', {  
+    await fetch('https://slcorp.or.id/api/prop/fetch_aproval.php', {  
         method: 'POST',   
         headers: {    
           Accept: 'application/json',    
@@ -107,7 +107,7 @@ export default class BookmarkScreen extends Component {
       Spinner: true 
     });
 
-    fetch('http://slcorp.or.id/api/prop/update_aproval.php', {  
+    fetch('https://slcorp.or.id/api/prop/update_aproval.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
@@ -172,8 +172,9 @@ export default class BookmarkScreen extends Component {
                 {/* <Image style={styles.cardImage} source={{uri:item.image}}/> */}
                 <View style={styles.cardHeader}>
                   <View>
-                    <Text style={styles.title}>{item.nama}</Text>
-                    <Text style={styles.description}>{item.nominal}</Text>
+                    <Text style={styles.title}>{item.dokumen} | {item.nama}</Text>
+                    <Text style={styles.description}>{item.nominal} | {item.status}</Text>
+                    <Text style={styles.description}>{item.relasi} | {item.dept} | </Text>
                     <Text style={styles.description}>{item.detail}</Text>
                     <View style={styles.timeContainer}>
                       <Text style={styles.time}>{item.tanggal}</Text>
@@ -188,12 +189,12 @@ export default class BookmarkScreen extends Component {
                         <Text style={styles.socialBarLabel}>Setujui</Text>
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.socialBarSection}>
+                    {/* <View style={styles.socialBarSection}>
                       <TouchableOpacity style={styles.socialBarButton} onPress={() => this.props.navigation.goBack()}>
                         <Icon name="close-circle" size={25} color={'#ff5252'}></Icon>
-                        <Text style={styles.socialBarLabel}>Tolak</Text>
+                        <Text style={styles.socialBarLabel}>Batal | Kembali</Text>
                       </TouchableOpacity>
-                    </View>
+                    </View> */}
                   </View>
                 </View>
               </View>
