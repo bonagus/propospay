@@ -97,6 +97,19 @@ const HomeScreen = ({navigation}) => {
                     />
                 </LinearGradient>
             </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{navigation.navigate('Notify')}}>
+                <LinearGradient
+                    colors={['#1976d2', '#2196f3']}
+                    style={styles.signIn}
+                >
+                    <Text style={styles.textSign}>Not</Text>
+                    <MaterialIcons 
+                        name="navigate-next"
+                        color="#fff"
+                        size={20}
+                    />
+                </LinearGradient>
+            </TouchableOpacity>
           </View>        
         </Animatable.View>
       </View>

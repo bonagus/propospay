@@ -23,6 +23,7 @@ import RootStackScreen from './screens/RootStack';
 import BookmarkScreen from './screens/Bookmark';
 import DetailsScreen from './screens/Details';
 import TrialScreen from './screens/Lists';
+import NotifyScreen from './screens/Notify';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -175,6 +176,7 @@ const App = () => {
           <ScreenStack.Screen name="List-Proposal" component={BookmarkScreen} />
           <ScreenStack.Screen name="Search" component={DetailsScreen} />
           <ScreenStack.Screen name="Trial" component={TrialScreen} options={{ title:'Kembali' }}  />
+          <ScreenStack.Screen name="Notify" component={NotifyScreen} options={{ title:'Kembali' }}  />
         </ScreenStack.Navigator>
       )
     :

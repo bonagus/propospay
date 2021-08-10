@@ -5,10 +5,14 @@ import {
   View,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert,
+  Modal,
+  ScrollView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-community/async-storage';
+import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 
 const STORAGE_KEY         = '@save_db';
 const STORAGE_KEY_ID      = '@save_db_id';
@@ -20,10 +24,13 @@ export default class BookmarkScreen extends Component {
     super(props);
     this.state = {
       data: [],
+      HeadTable: ['Keterangan', 'Nominal'],
+      DataTable: [],
+      isVisible: false,
       Spinner: true
     };
   }
-
+  
   async componentDidMount() {
     try {
       const valDb = await AsyncStorage.getItem(STORAGE_KEY);
@@ -51,7 +58,7 @@ export default class BookmarkScreen extends Component {
       // Error retrieving data
     }
 
-    await fetch('https://slcorp.or.id/api/prop/fetch_aproval.php', {  
+    await fetch('http://slcorp.or.id/api/prop/fetch_aproval.php', {  
         method: 'POST',   
         headers: {    
           Accept: 'application/json',    
@@ -107,7 +114,7 @@ export default class BookmarkScreen extends Component {
       Spinner: true 
     });
 
-    fetch('https://slcorp.or.id/api/prop/update_aproval.php', {  
+    fetch('http://slcorp.or.id/api/prop/update_aproval.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
@@ -144,6 +151,45 @@ export default class BookmarkScreen extends Component {
         console.error(error);
     });
   }
+  detailList(show, dokumen){
+
+    fetch('http://slcorp.or.id/api/prop/fetch_detail.php', {  
+        method: 'POST',
+        headers: {
+            'Accept'        : 'application/json',
+            'Content-Type'  : 'application/json',
+        },
+        body: JSON.stringify({
+            database: this.state.valDb,
+            id_dok: dokumen
+        })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //Hide Loader
+        console.log(responseJson);
+        // console.log(data.username);
+        
+        // If server response message same as Data Matched
+        if (responseJson.result) {
+            this.setState({ 
+              DataTable: responseJson.data,
+              isVisible: show
+            });
+            console.log(responseJson.data);
+            // this.setState({isVisible: show});
+
+        } else {
+            alert('tidak ditemukan.');
+            console.log('null obsku');
+            return;
+        }
+    })
+    .catch((error) => {
+        //Hide Loader
+        console.error(error);
+    });
+  }
 
   render() {
     if( this.state.Spinner ) {
@@ -155,6 +201,29 @@ export default class BookmarkScreen extends Component {
     }
     return (
       <View style={styles.container}>
+        <Modal
+          animationType = {"slide"}
+          transparent={false}
+          visible={this.state.isVisible}
+          onRequestClose={() => {
+            Alert.alert('Tekan tutup untuk menutup dialog.');
+          }}>
+          <ScrollView>
+            <Table borderStyle={{borderWidth: 2, borderColor: '#000'}}>
+              <Row data={this.state.HeadTable} style={styles.HeadStyle} textStyle={styles.TableText}/>
+              <Rows data={this.state.DataTable} textStyle={styles.TableText}/>
+            </Table>
+
+            <Text 
+              style={styles.closeText}
+              onPress={() => {
+                this.setState({ 
+                  isVisible: false
+                });
+              }}>Tutup</Text>
+          </ScrollView>
+        </Modal>
+
         <FlatList style={styles.list}
           data={this.state.data}
           keyExtractor= {(item) => {
@@ -189,12 +258,12 @@ export default class BookmarkScreen extends Component {
                         <Text style={styles.socialBarLabel}>Setujui</Text>
                       </TouchableOpacity>
                     </View>
-                    {/* <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.props.navigation.goBack()}>
-                        <Icon name="close-circle" size={25} color={'#ff5252'}></Icon>
-                        <Text style={styles.socialBarLabel}>Batal | Kembali</Text>
+                    <View style={styles.socialBarSection}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.detailList(true, item.dokumen)}>
+                        <Icon name="list-outline" size={25} color={'#191919'}></Icon>
+                        <Text style={styles.socialBarLabel}>Detail</Text>
                       </TouchableOpacity>
-                    </View> */}
+                    </View>
                   </View>
                 </View>
               </View>
@@ -306,5 +375,50 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  /********* modal *************/
+  closeButton: {
+    display: 'flex',
+    height: 60,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FF3974',
+    shadowColor: '#2AC062',
+    shadowOpacity: 0.5,
+    shadowOffset: { 
+      height: 10, 
+      width: 0 
+    },
+    shadowRadius: 25,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 22,
+  },
+  image: {
+    marginTop: 50,
+    marginBottom: 10,
+    width: '100%',
+    height: 350,
+  },
+  text: {
+    fontSize: 24,
+    marginBottom: 30,
+    padding: 40,
+  },
+  closeText: {
+    marginTop: 50,
+    fontSize: 24,
+    color: '#00479e',
+    textAlign: 'center',
+  },
+  HeadStyle: { 
+    height: 50,
+    alignContent: "center",
+    backgroundColor: '#1abc9c'
+  },
+  TableText: { 
+    margin: 10
   }
 });

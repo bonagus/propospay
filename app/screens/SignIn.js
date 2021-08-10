@@ -140,7 +140,7 @@ const SignInScreen = ({navigation}) => {
             return;
         }
 
-        fetch('https://slcorp.or.id/api/prop/login.php', {  
+        fetch('http://slcorp.or.id/api/prop/login.php', {  
             method: 'POST',
             headers: {
                 'Accept'        : 'application/json',
@@ -179,6 +179,7 @@ const SignInScreen = ({navigation}) => {
             //Hide Loader
             setSpinner(false);
             console.error(error);
+            console.log('responseJson');
         });
         // if ( foundUser.length == 0 ) {
         //     Alert.alert('Invalid User!', 'Username or password is incorrect.', [

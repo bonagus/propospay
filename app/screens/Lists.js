@@ -9,16 +9,20 @@ import {
   UIManager,
   View
 } from 'react-native';
-import Faq from './Faq'
+import Faq from './Faq';
 import LinearGradient from 'react-native-linear-gradient';
 import { Colors } from '../components/Colors';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default class Lists extends Component { 
     
   constructor(props) {
     super(props);
     this.state = {
-      menu :[
+      menu: [
+        
+      ],
+      menuq :[
         { 
           title: 'Kenapa Enak?', 
           data: 'Karena ............................................',
@@ -71,6 +75,35 @@ export default class Lists extends Component {
      }
   }
 
+  componentDidMount() {
+    fetch('http://192.168.1.239/api/lapar/faq.php', {  
+        method: 'POST',   
+        headers: {    
+          Accept: 'application/json',    
+          'Content-Type': 'application/json' 
+        }
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        
+        console.log(responseJson);
+        console.log(responseJson.result);
+        if (responseJson.result) {
+            this.setState({ 
+              menu: responseJson.data,
+            });
+        } else {
+            alert('masalah pada jaringan, coba beberapa saat lagi!.');
+            console.log('null obsku');
+            return;
+        }
+      })
+      .catch((error) => {
+          alert('cek koneksi internet anda!.');
+          console.error(error);
+      });
+  };
+
   render() {
     return (
       <ScrollView style={styles.container}>
@@ -100,7 +133,7 @@ export default class Lists extends Component {
           items.push(
               <Faq 
                   title = {item.title}
-                  data = {item.data}
+                  data = {item.content}
               />
           );
       }

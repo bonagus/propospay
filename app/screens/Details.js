@@ -29,12 +29,8 @@ class DetailsScreen extends Component {
       vals          : new Date(),
       showDatePicker: false,
       search        : '',
-    };
-    this.state = {
-      data: [
-        // {id:1, title: "Lorem ipsum dolor", time:"2018-08-01 12:15 pm", nominal:"5000000", description:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean  ligula..."},
-      ],
-      Spinner: false 
+      data          : [],
+      Spinner       : false 
     };
   }
 
@@ -75,7 +71,7 @@ class DetailsScreen extends Component {
       Spinner: true 
     });
 
-    fetch('https://slcorp.or.id/api/prop/search_aproval.php', {  
+    fetch('http://slcorp.or.id/api/prop/search_aproval.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
@@ -150,7 +146,7 @@ class DetailsScreen extends Component {
       Spinner: true
     });
 
-    fetch('https://slcorp.or.id/api/prop/advanced_update.php', {  
+    fetch('http://slcorp.or.id/api/prop/advanced_update.php', {  
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
@@ -214,16 +210,21 @@ class DetailsScreen extends Component {
         );
     }
     
+    // const { vals, } = this.state;
     const showDatePicker = this.state.showDatePicker ?
           <DateTimePicker
-            testID="dateTimePicker"
-            value={this.state.vals}
-            mode="date"
+            testID  = "dateTimePicker"
+            value   = {this.state.vals}
+            mode    = "date"
             // is24Hour={true}
             display="default"
+            // onChange={(event, value) => {
+            //     this.setState({
+            //       vals: value,
+            //     });
             onChange={(vals)=>this.setState({vals})}
           /> : <View />
-
+          console.log(this.state.vals);
     return (
       <View style={styles.container}>
         <View style={styles.formContent}>
@@ -267,12 +268,7 @@ class DetailsScreen extends Component {
             />
           </View>
           <View style={styles.inputContainer}>
-            <TextInput style={styles.inputs}
-                ref={'txtPassword'}
-                placeholder="Tanggal Akhir"
-                keyboardType = 'numeric'
-                underlineColorAndroid='transparent'
-                onChangeText={(search) => this.setState({search})}/>
+            <Button onPress={() => this.setState({showDatePicker: !this.state.showDatePicker})} title="Show date picker!" />
           </View>
           <TouchableOpacity style={styles.saveButton} onPress={() => this.cariNoDok(this.state.search)}>
             <Image 
