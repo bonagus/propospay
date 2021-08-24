@@ -4,8 +4,11 @@ import {
   View,
   Alert,
   BackHandler,  
-  FlatList,
-  TouchableOpacity
+  FlatList, 
+  Modal,
+  Button,
+  TouchableOpacity,
+  Dimensions
 } from 'react-native';
 import {
     useTheme,
@@ -21,17 +24,23 @@ import {
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-community/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Picker from '@react-native-picker/picker';
 
 const STORAGE_KEY       = '@save_db';
 const STORAGE_KEYLOG    = '@save_db_login';
 // const STORAGE_KEYID     = '@save_db_id';
 
-import{ AuthContext } from '../components/context';
+import{ AuthContext } from '../components/context'; 
 
 const ProfileScreen = () => {
 
-  const [uname, setuname] = React.useState(''); 
+  const [uname, setuname]   = React.useState(''); 
   const [dbname, setdbname] = React.useState(''); 
+  const [mdlent, setmdlent] = React.useState(false);
+  const [spin, setspin]     = React.useState(false);
+  const [ent, setent]       = React.useState('');
 
   React.useEffect(() => {
       readData()
@@ -51,6 +60,16 @@ const ProfileScreen = () => {
           alert('Failed to fetch the data from storage')
       }
   }
+
+  // save data
+  const setData = async (entyty) => {
+      try {
+          AsyncStorage.setItem(STORAGE_KEY, entyty);
+          console.log(STORAGE_KEY);
+      } catch (e) {
+          alert('Failed to fetch the data from storage')
+      }
+  }
   
   const clearStorage = async () => {
       try {
@@ -59,6 +78,39 @@ const ProfileScreen = () => {
       } catch (e) {
           alert('Failed to clear the async storage.')
       }
+  }
+
+  const confrim_ent = (entyty) => {
+    if ( !entyty || entyty == '0' ) {
+        return;
+    }
+    return Alert.alert(
+      "Rubah Entitas?",
+      "Apakah Anda Yakin ingin mengubah entitas?",
+      [
+        // The "Yes" button
+        {
+          text: "Ya",
+          onPress: () => {
+            setData(entyty);
+            readData();
+            setmdlent(false);
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "Batal",
+          onPress: () => {
+            setmdlent(false);
+          },
+        },
+      ]
+    );
+    // if (!valDb) return
+    // console.log(valDb)
+    // saveData(valDb)
+    // setValDb(valDb)
   }
 
   const paperTheme = useTheme();
@@ -109,14 +161,110 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
+        <Modal
+          animationType = "slide"
+          presentationStyle = "overFullScreen" 
+          transparent visible = {mdlent}
+          onRequestClose={() => {setmdlent(false)}}>
+          <View style={styles.viewWrapper}>
+            <View style={styles.modalView}>
+              <View>
+                  <Picker
+                    selectedValue={ent}
+                    style={{ height: 50, width: 250 }}
+                    onValueChange={value => {
+                        if (value != "0")
+                          setent(value)
+                        // so it won't care if header is selected...
+                    }}>
+                    <Picker.Item label="Pilih Entitas" value="0" />
+                    <Picker.Item label="Head Office" value="HO" />
+                    <Picker.Item label="Industrial Center" value="IC" />
+                    <Picker.Item label="Mini Plan Palembang" value="MP" />
+                  </Picker>
+                  {/* <Text style = {styles.text}>{ent}</Text> */}
+              </View>
+              {/** This button is responsible to close the modal */}
+              <View style={styles.unaprv}>
+                <Button 
+                  title="Simpan"
+                  onPress={() => {confrim_ent(ent)}} />
+                <Button 
+                  title="Batal" 
+                  onPress={() => {setmdlent(false)}} />
+              </View>
+            </View>
+          </View>
+        </Modal>
         <View style={styles.header}></View>
-        <Icon style={styles.avatar} name="ios-person" size={125} color={'#FFFFFF'}/>
+        <MaterialIcons style={styles.avatar} 
+            name="account-circle"
+            color="#FFFFFF"
+            size={125}
+        />
+        {/* <Icon style={styles.avatar} name="ios-person" size={125} color={'#FFFFFF'}/> */}
         <View style={styles.subheader}>
-          <Text style={styles.name}>Anda Login Sebagai</Text> 
-          <Text style={styles.name}>Nama : {uname}</Text> 
-          <Text style={styles.name}>Entitas : {dbname}</Text> 
+          <Text style={styles.name}>Informasi Login:</Text> 
+          {/* <Text style={styles.name}>Nama : {uname}</Text>  */}
+          {/* <Text style={styles.name}>Entitas : {dbname}</Text>  */}
         </View>
+        <View style={styles.profileDetail}>
+          <View style={styles.detailContent}>
+            <Text style={styles.title}>Userid</Text>
+            <Text style={styles.count}>{uname}</Text>
+          </View>
+          <View style={styles.detailContent}>
+            <Text style={styles.title}>Entitas</Text>
+            <Text style={styles.count}>{dbname}</Text>
+          </View>
+        </View>
+        
         <View style={styles.body}>
+          <View style={styles.button}>
+            <TouchableOpacity onPress={() => {setmdlent(true)}}>
+                <LinearGradient
+                    colors={['#134E5E', '#71B280']}
+                    style={styles.signIn}
+                >
+                    <Text style={styles.textSign}>Ganti Entitas </Text>
+                    <MaterialIcons 
+                        name="double-arrow"
+                        color="#fff"
+                        size={20}
+                    />
+                </LinearGradient>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.button}>
+            <TouchableOpacity onPress={confirmButton}>
+                <LinearGradient
+                    colors={['#FF8008', '#FFC837']}
+                    style={styles.signIn}
+                >
+                    <Text style={styles.textSign}>Logouts </Text>
+                    <MaterialIcons 
+                        name="exit-to-app"
+                        color="#fff"
+                        size={20}
+                    />
+                </LinearGradient>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.button}>
+            <TouchableOpacity onPress={confirmButtoff}>
+                <LinearGradient
+                    colors={['#EB3349', '#F45C43']}
+                    style={styles.signIn}
+                >
+                    <Text style={styles.textSign}>Keluar </Text>
+                    <MaterialIcons 
+                        name="settings-power"
+                        color="#fff"
+                        size={20}
+                    />
+                </LinearGradient>
+            </TouchableOpacity>
+          </View>
           <View style={styles.bodyContent}>
             {/* <TouchableOpacity style={styles.buttonContainers}>
               <Text 
@@ -126,15 +274,16 @@ const ProfileScreen = () => {
                 Ubah Tema
               </Text> 
             </TouchableOpacity>        */}
-            <TouchableOpacity style={styles.buttonContainer}  onPress={confirmButton}>
-              <Text style={styles.info}>Logout </Text>
+{/* 
+            {/* <TouchableOpacity style={styles.buttonContainer}  onPress={}>
+              <Text style={styles.info}> </Text>
               <Icon name="log-out" size={20} color={'#fff'}/> 
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-            <TouchableOpacity style={styles.buttonContainer}  onPress={confirmButtoff}>
+            {/* <TouchableOpacity style={styles.buttonContainer}  onPress={}>
               <Text style={styles.info}>Keluar </Text> 
               <Icon name="power" size={20} color={'#fff'}/> 
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
       </View>
     </View>
@@ -142,6 +291,8 @@ const ProfileScreen = () => {
 }
 
 export default ProfileScreen;
+
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   header:{
@@ -163,8 +314,31 @@ const styles = StyleSheet.create({
     position: 'absolute',
     marginTop:25
   },
+  profileDetail:{
+    alignSelf: 'center',
+    marginTop:185,
+    alignItems: 'center',
+    flexDirection: 'row',
+    position:'absolute',
+    backgroundColor: "#FFFFFF"
+  },
+  detailContent:{
+    margin:15,
+    alignItems: 'center'
+  },
+  title:{
+    fontSize:20,
+    color: "#219ebc",
+    fontWeight: 'bold'
+  },
+  count:{
+    marginTop:5,
+    fontSize:20,
+    color: "#616b6b",
+    fontWeight: 'bold'
+  },
   body:{
-    marginTop:0,
+    marginTop:20,
   },
   bodyContent: {
     flex: 1,
@@ -210,4 +384,54 @@ const styles = StyleSheet.create({
     borderRadius:30,
     backgroundColor: "#757575",
   },
+  button: {
+      alignItems: 'flex-end',
+      marginTop: 20,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  signIn: {
+      marginTop:10,
+      width: 200,
+      height: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 50,
+      flexDirection: 'row'
+  },
+  textSign: {
+      color: 'white',
+      fontWeight: 'bold'
+  },
+  viewWrapper: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.2)",
+  },
+  modalView: {
+      alignItems: "center",
+      justifyContent: "center",
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      elevation: 5,
+      transform: [{ translateX: -(width * 0.4) }, 
+                  { translateY: -90 }],
+      height: 180,
+      width: width * 0.8,
+      backgroundColor: "#fff",
+      borderRadius: 7,
+  },
+  unaprv:{
+    flexDirection: 'row', 
+    width: '60%', 
+    justifyContent: 'space-between',
+  },
+  containers: {
+    flex: 1,
+    paddingTop: 40,
+    alignItems: "center"
+  }
 });

@@ -19,9 +19,7 @@ export default class Lists extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      menu: [
-        
-      ],
+      menu: [],
       menuq :[
         { 
           title: 'Kenapa Enak?', 
@@ -76,11 +74,11 @@ export default class Lists extends Component {
   }
 
   componentDidMount() {
-    fetch('http://192.168.1.239/api/lapar/faq.php', {  
-        method: 'POST',   
-        headers: {    
-          Accept: 'application/json',    
-          'Content-Type': 'application/json' 
+    fetch('http://192.168.1.9/data/faq.php', {  
+        method  : 'POST',   
+        headers : {    
+          Accept        : 'application/json',
+          'Content-Type': 'application/json'
         }
     })
       .then((response) => response.json())
@@ -132,8 +130,9 @@ export default class Lists extends Component {
       for (var item of this.state.menu) {
           items.push(
               <Faq 
+                  id    = {item.id}
                   title = {item.title}
-                  data = {item.content}
+                  data  = {item.content}
               />
           );
       }

@@ -37,7 +37,7 @@ export default class Faq extends Component {
                 size={30}
             />
         </TouchableOpacity>
-        <View style={styles.parentHr}/>
+        <View style={styles.parentHr} key={this.props.id} />
         {
             this.state.expanded &&
             <View style={styles.child}>

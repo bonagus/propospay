@@ -22,8 +22,8 @@ const PropayMenu2 = props => {
   return (
     <View style={{width: `${100/3}%`, alignItems: 'center'}}>
       <TouchableOpacity onPress={props.onPress}>
-        <View style={{height: 58, width: 58, borderWidth: 1, borderColor: 'lightgrey', borderRadius: 18, justifyContent:'center', alignItems: 'center'}}>
-          <Image source={props.image}/>
+        <View style={{height: 58, width: 58, borderWidth: 5, borderColor: '#000b33', borderRadius: 18, justifyContent:'center', alignItems: 'center'}}>
+          <Image source={props.image} style={styles.image}/>
         </View>
         <Text style={{fontSize: 11, fontWeight: 'bold', justifyContent:'center', alignSelf: 'center', marginTop: 6}}>{props.name}</Text>
       </TouchableOpacity>
@@ -74,17 +74,17 @@ const HomeScreen = ({navigation}) => {
         >
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Cepat!</Text>
           <Text style={styles.text}>Pilih salah satu tipe approval dibawah.</Text>    
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 18}}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 18, paddingTop: 25}}>
             {/* <PropayMenu2 name='Belum Approval' image={require('../assets/icon/go-more.png')} onPress={() => onSelectApprvl('0')}/> */}
-            <PropayMenu2 name='Approval 1' image={require('../assets/icon/go-deals.png')} onPress={() => onSelectApprvl('1')}/>
-            <PropayMenu2 name='Approval 2' image={require('../assets/icon/promo.png')} onPress={() => onSelectApprvl('2')}/>
-            <PropayMenu2 name='Approval 3' image={require('../assets/icon/go-send.png')} onPress={() => onSelectApprvl('3')}/>
+            <PropayMenu2 name='Approval 1' image={require('../assets/number/num_1.png')} onPress={() => onSelectApprvl('1')}/>
+            <PropayMenu2 name='Approval 2' image={require('../assets/number/num_2.png')} onPress={() => onSelectApprvl('2')}/>
+            <PropayMenu2 name='Approval 3' image={require('../assets/number/num_3.png')} onPress={() => onSelectApprvl('3')}/>
           </View>
           <View style={{height: 5, marginTop: 50}}></View>
           <Text style={[styles.title, { color: colors.text }]}>Pencarian Dengan Nomor Dokumen!</Text>
           <Text style={styles.text}>Klik tombol untuk melakukan pencarian dengan filter.</Text>   
           <View style={styles.button}>
-            <TouchableOpacity onPress={()=>{navigation.navigate('Trial')}}>
+            <TouchableOpacity onPress={()=>{navigation.navigate('Search')}}>
                 <LinearGradient
                     colors={['#1976d2', '#2196f3']}
                     style={styles.signIn}
@@ -110,7 +110,7 @@ const HomeScreen = ({navigation}) => {
                     />
                 </LinearGradient>
             </TouchableOpacity>
-          </View>        
+          </View>   
         </Animatable.View>
       </View>
     );
@@ -219,5 +219,9 @@ const styles = StyleSheet.create({
   textSign: {
       color: 'white',
       fontWeight: 'bold'
+  },
+  image: {
+      height: 40, 
+      width: 40,
   }
 });

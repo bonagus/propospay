@@ -8,7 +8,10 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
-  ScrollView
+  ScrollView,
+  TextInput,
+  Button,
+  Dimensions
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -23,14 +26,22 @@ export default class BookmarkScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [],
-      HeadTable: ['Keterangan', 'Nominal'],
-      DataTable: [],
-      isVisible: false,
-      Spinner: true
+      data        : [],
+      HeadTable   : ['Keterangan', 'Nominal'],
+      DataTables  : [],
+      tableData   : [],
+      DataTable   : [],
+      isVisible   : false,
+      isUnApprv   : false,
+      Spinner     : true,
+      catatan     : '', 
+      itemid      : '', 
+      itemdebet_rp: '', 
+      itemxlimit  : '', 
+      itemappke   : ''
     };
   }
-  
+
   async componentDidMount() {
     try {
       const valDb = await AsyncStorage.getItem(STORAGE_KEY);
@@ -57,25 +68,31 @@ export default class BookmarkScreen extends Component {
     } catch (error) {
       // Error retrieving data
     }
+    
+    this.refreshapp( this.state.valDb, this.state.idUser, this.state.stageApprvl );
+    
+  }
 
-    await fetch('http://slcorp.or.id/api/prop/fetch_aproval.php', {  
+  refreshapp = ( valDb, idUser, stageApprvl ) => {
+
+    fetch('http://slcorp.or.id/api/prop/fetch_aproval.php', {  
         method: 'POST',   
         headers: {    
           Accept: 'application/json',    
           'Content-Type': 'application/json'  
         },
         body: JSON.stringify({
-          database: this.state.valDb,
-          kodeuser: this.state.idUser,
-          approval: this.state.stageApprvl
+          database: valDb,
+          kodeuser: idUser,
+          approval: stageApprvl
         })
     })
     .then((response) => response.json())
     .then((responseJson) => {
         //Hide Loader
-        console.log(this.state.idUser);
-        console.log(responseJson);
-            console.log(responseJson.result);
+        // console.log(this.state.idUser);
+        // console.log(responseJson);
+            // console.log(responseJson.result);
         // console.log(data.username);
         // If server response message same as Data Matched
         if (responseJson.result) {
@@ -84,6 +101,7 @@ export default class BookmarkScreen extends Component {
               Spinner: false 
             });
             console.log(responseJson.data);
+            console.log(valDb);
 
         } else {
             // setErrortext(responseJson.result);
@@ -101,20 +119,67 @@ export default class BookmarkScreen extends Component {
         this.setState({ 
           Spinner: false 
         });
-        console.error('e');
-        console.log(this.state.stageApprvl);
+        // console.error('e');
+        // console.log(this.state.stageApprvl);
         console.error(error);
     });
+
+  }
+
+  confrim_app(id_ap, rp_ap, limit, stage){
+    return Alert.alert(
+      "Approve Proposal?",
+      "Apakah Anda Yakin ingin mengapprove proposal ini?",
+      [
+        // The "Yes" button
+        {
+          text: "Ya",
+          onPress: () => {
+            this.approveHandle(id_ap, rp_ap, limit, stage);
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "Batal",
+        },
+      ]
+    );
     
+  }
+
+  confrim_unapp(catatan){
+    if ( !catatan || catatan.length < 1 ) {
+        alert('Catatan tidak boleh Kosong!');
+        return;
+    }
+    return Alert.alert(
+      "UnApprove Proposal?",
+      "Semua Approve pada dokumen proposal ini akan direset?",
+      [
+        // The "Yes" button
+        {
+          text: "Ya",
+          onPress: () => {
+            this.unapprove(this.state.itemid, catatan);
+          },
+        },
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "Batal",
+        },
+      ]
+    );
   }
 
   approveHandle = (id_ap, rp_ap, limit, stage) => {
     // alert(id_ap+' '+rp_ap+' '+limit+' '+stage);
-    this.setState({ 
-      Spinner: true 
+    this.setState({
+      Spinner: true
     });
 
-    fetch('http://slcorp.or.id/api/prop/update_aproval.php', {  
+    fetch('http://slcorp.or.id/api/prop/update_aproval.php', {
         method: 'POST',
         headers: {
             'Accept'        : 'application/json',
@@ -138,11 +203,19 @@ export default class BookmarkScreen extends Component {
         // If server response message same as Data Matched
         if (responseJson.result) {
             alert(responseJson.message);
-            this.props.navigation.goBack();
+            this.setState({ 
+              isVisible: false
+            });
+            this.refreshapp( this.state.valDb, this.state.idUser, this.state.stageApprvl );
+            // this.props.navigation.goBack();
             // signIn(responseJson.username);
         } else {
             alert(responseJson.message);
-            this.props.navigation.goBack();
+            this.setState({ 
+              isVisible: false
+            });
+            this.refreshapp( this.state.valDb, this.state.idUser, this.state.stageApprvl );
+            // this.props.navigation.goBack();
             return;
         }
     })
@@ -151,7 +224,63 @@ export default class BookmarkScreen extends Component {
         console.error(error);
     });
   }
-  detailList(show, dokumen){
+
+  unapprove = (itemid, catatan) => {
+    // alert(itemid+' '+itemdebet_rp+' '+itemxlimit+' '+itemappke+' '+catatan);
+    this.setState({
+      Spinner: true
+    });
+
+    fetch('http://slcorp.or.id/api/prop/un_approv.php', {
+        method: 'POST',
+        headers: {
+            'Accept'        : 'application/json',
+            'Content-Type'  : 'application/json',
+        },
+        body: JSON.stringify({
+            database: this.state.valDb,
+            kodeuser: this.state.idUser,
+            // tahaprov: itemappke,
+            kd_aprvl: itemid,
+            // nominal : itemdebet_rp,
+            // usrlimit: itemxlimit,
+            catatan : catatan
+        })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //Hide Loader
+        console.log(responseJson);
+        // console.log(data.username);
+        
+        // If server response message same as Data Matched
+        if (responseJson.result) {
+            alert(responseJson.message);
+            this.setState({ 
+              isVisible: false,
+              isUnApprv: false
+            });
+            this.refreshapp( this.state.valDb, this.state.idUser, this.state.stageApprvl );
+            // this.props.navigation.goBack();
+            // signIn(responseJson.username);
+        } else {
+            alert(responseJson.message);
+            this.setState({ 
+              isVisible: false,
+              isUnApprv: false
+            });
+            this.refreshapp( this.state.valDb, this.state.idUser, this.state.stageApprvl );
+            // this.props.navigation.goBack();
+            return;
+        }
+    })
+    .catch((error) => {
+        //Hide Loader
+        console.error(error);
+    });
+  }
+  
+  detailList(show, dokumen, itemid, itemdebet_rp, itemxlimit, itemappke){
 
     fetch('http://slcorp.or.id/api/prop/fetch_detail.php', {  
         method: 'POST',
@@ -176,7 +305,20 @@ export default class BookmarkScreen extends Component {
               DataTable: responseJson.data,
               isVisible: show
             });
-            console.log(responseJson.data);
+            console.log(this.state.DataTable.length%2);
+            const tableData = [];
+            for (let x = 0; x < 1; x += 1) {
+              tableData.push(`${x}`);
+            }
+            this.setState({ 
+              tableData: tableData,
+              itemid      : itemid, 
+              itemdebet_rp: itemdebet_rp, 
+              itemxlimit  : itemxlimit, 
+              itemappke   : itemappke
+            });
+            // console.log(tableData);
+            // console.log(this.state.tableData);
             // this.setState({isVisible: show});
 
         } else {
@@ -187,6 +329,7 @@ export default class BookmarkScreen extends Component {
     })
     .catch((error) => {
         //Hide Loader
+        // console.log(dokumen+' '+this.state.valDb);
         console.error(error);
     });
   }
@@ -200,7 +343,9 @@ export default class BookmarkScreen extends Component {
         );
     }
     return (
+      
       <View style={styles.container}>
+        {/* Modal Detail */}
         <Modal
           animationType = {"slide"}
           transparent={false}
@@ -209,21 +354,119 @@ export default class BookmarkScreen extends Component {
             Alert.alert('Tekan tutup untuk menutup dialog.');
           }}>
           <ScrollView>
-            <Table borderStyle={{borderWidth: 2, borderColor: '#000'}}>
-              <Row data={this.state.HeadTable} style={styles.HeadStyle} textStyle={styles.TableText}/>
-              <Rows data={this.state.DataTable} textStyle={styles.TableText}/>
+          <View style={styles.separator}/>
+            <View style={styles.card}>
+            <Table borderStyle={{borderWidth: 1, borderColor: '#e6e6e6'}}>
+              <Row 
+                data={this.state.HeadTable} 
+                style={styles.HeadStyle} 
+                textStyle={styles.TableTexts}/>
+                {
+                  this.state.tableData.map((i) => (
+                    <Rows 
+                      key={i} 
+                      data={this.state.DataTable} 
+                      // widthArr={this.state.HeadTable}
+                      style={[styles.row, i%2 && {backgroundColor: '#DFF5F2'}]} 
+                      textStyle={styles.TableText}/>
+                  )) 
+                }
+                {/* <Rows                     
+                // key={index}
+                data={this.state.DataTable}                       
+                style={[styles.row, this.state.DataTable.length%2 && {backgroundColor: '#DFF5F2'}]}
+                textStyle={styles.TableText}/> */}
             </Table>
-
-            <Text 
+            {/* <Text 
               style={styles.closeText}
               onPress={() => {
-                this.setState({ 
+                this.setState({
                   isVisible: false
                 });
-              }}>Tutup</Text>
+              }}>Tutup</Text> */}
+              </View>
+              <View style={styles.separator}/>
+                <View style={styles.cardFooter}>
+                  <View style={styles.socialBarContainer}>
+                    <View style={styles.socialBarSection}>
+                      <TouchableOpacity 
+                        style={styles.socialBarButton} 
+                        onPress={() => 
+                          this.confrim_app(
+                            this.state.itemid,
+                            this.state.itemdebet_rp,
+                            this.state.itemxlimit,
+                            this.state.itemappke
+                          )}>
+                        <Icon name="shield-checkmark" size={25} color={'#4caf50'}></Icon>
+                        <Text style={styles.socialBarLabel}>Approve</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.socialBarSection}>
+                      <TouchableOpacity 
+                        style={styles.socialBarButton} 
+                        onPress={() => {
+                            this.setState({ 
+                              isVisible: false
+                            });
+                          }
+                        }>
+                        <Icon name="close-circle" size={25} color={'#191919'}></Icon>
+                        <Text style={styles.socialBarLabel}>Tutup</Text>
+                      </TouchableOpacity>
+                    </View>
+                    { this.state.stageApprvl == 1 ? null : 
+                    <View style={styles.socialBarSection}>
+                      <TouchableOpacity 
+                        style={styles.socialBarButton} 
+                        onPress={() => {
+                            this.setState({ 
+                              isUnApprv: true
+                            });
+                          }
+                        }>
+                        <Icon name="backspace" size={25} color={'#bd1c2c'}></Icon>
+                        <Text style={styles.socialBarLabel}>UnApprove</Text>
+                      </TouchableOpacity>
+                    </View>
+                    }
+                  </View>
+                </View>
           </ScrollView>
         </Modal>
+        {/* Modal Catatan */}
+        <Modal  animationType="slide" 
+                transparent visible={this.state.isUnApprv} 
+                presentationStyle="overFullScreen" 
+                onDismiss={() => {
+                  Alert.alert('Tekan tutup untuk menutup dialog.');
+                }}>
+          <View style={styles.viewWrapper}>
+            <View style={styles.modalView}>
+            <TextInput 
+                style={styles.textInput} 
+                placeholder="Alasan Ketidaksetujuan."
+                // onSubmitEditing={()=> this.password.focus()}
+                onChangeText={catatan => this.setState({catatan})}
+                />
 
+              {/** This button is responsible to close the modal */}
+              <View style={styles.unaprv}>
+                <Button 
+                  title="Simpan" 
+                  onPress={() =>  this.confrim_unapp(this.state.catatan) } /> 
+                <Button 
+                  title="Batal" 
+                  onPress={() => {
+                      this.setState({ 
+                        isUnApprv: false
+                      });
+                    }
+                  } />
+              </View>
+            </View>
+          </View>
+        </Modal>
         <FlatList style={styles.list}
           data={this.state.data}
           keyExtractor= {(item) => {
@@ -253,17 +496,33 @@ export default class BookmarkScreen extends Component {
                 <View style={styles.cardFooter}>
                   <View style={styles.socialBarContainer}>
                     <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.approveHandle(item.id, item.debet_rp, item.xlimit, item.appke )}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.confrim_app(item.id, item.debet_rp, item.xlimit, item.appke )}>
                         <Icon name="shield-checkmark" size={25} color={'#4caf50'}></Icon>
-                        <Text style={styles.socialBarLabel}>Setujui</Text>
+                        <Text style={styles.socialBarLabel}>Approve</Text>
                       </TouchableOpacity>
                     </View>
                     <View style={styles.socialBarSection}>
-                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.detailList(true, item.dokumen)}>
+                      <TouchableOpacity style={styles.socialBarButton} onPress={() => this.detailList(true, item.dokumen, item.id, item.debet_rp, item.xlimit, item.appke )}>
                         <Icon name="list-outline" size={25} color={'#191919'}></Icon>
                         <Text style={styles.socialBarLabel}>Detail</Text>
                       </TouchableOpacity>
                     </View>
+                    { this.state.stageApprvl == 1 ? null : 
+                    <View style={styles.socialBarSection}>
+                      <TouchableOpacity
+                        style={styles.socialBarButton} 
+                        onPress={() => {
+                            this.setState({ 
+                              isUnApprv   : true,
+                              itemid      : item.id
+                            });
+                          }
+                        }>
+                        <Icon name="backspace" size={25} color={'#bd1c2c'}></Icon>
+                        <Text style={styles.socialBarLabel}>UnApprove</Text>
+                      </TouchableOpacity>
+                    </View>
+                    }
                   </View>
                 </View>
               </View>
@@ -273,6 +532,8 @@ export default class BookmarkScreen extends Component {
     );
   }
 }
+
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container:{
@@ -367,14 +628,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   socialBarlabel: {
-    marginLeft: 8,
+    marginLeft: 10,
     alignSelf: 'flex-end',
-    justifyContent: 'center',
+    // justifyContent: 'center',
+    fontWeight: 'bold'
   },
   socialBarButton:{
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: 5,
   },
   /********* modal *************/
   closeButton: {
@@ -416,9 +681,52 @@ const styles = StyleSheet.create({
   HeadStyle: { 
     height: 50,
     alignContent: "center",
-    backgroundColor: '#1abc9c'
+    backgroundColor: '#fff'
+  },
+  TableTexts: { 
+    textAlign: 'center',
+    margin: 10,
+    fontWeight: 'bold'
   },
   TableText: { 
+    textAlign: 'center',
     margin: 10
+  },
+  row:{
+    backgroundColor: '#fff'
+  },
+  viewWrapper: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.2)",
+  },
+  modalView: {
+      alignItems: "center",
+      justifyContent: "center",
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      elevation: 5,
+      transform: [{ translateX: -(width * 0.4) }, 
+                  { translateY: -90 }],
+      height: 180,
+      width: width * 0.8,
+      backgroundColor: "#fff",
+      borderRadius: 7,
+  },
+  textInput: {
+      width: "80%",
+      borderRadius: 5,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderColor: "rgba(0, 0, 0, 0.2)",
+      borderWidth: 1,
+      marginBottom: 8,
+  },
+  unaprv:{
+    flexDirection: 'row', 
+    width: '60%', 
+    justifyContent: 'space-between',
   }
 });

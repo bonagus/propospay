@@ -33,7 +33,7 @@ export default class Notifitem extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.list}>
+        <View style={styles.list} key={this.props.id}>
           <View style={styles.separator}>
             <TouchableOpacity>
               <View style={styles.card}>
